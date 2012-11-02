@@ -1,5 +1,4 @@
-Simple bash scripts to allow for control of pulseaudio with alsautils.
-
+Simple bash scripts to allow for control of pulseaudio with alsautils. 
 Simply map the following scripts to keyboard shortcuts in your DE or WM.
 Xfce4 allows for this under Settings > Keyboard > Application Shortcuts.
 
