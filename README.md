@@ -8,3 +8,6 @@ Xfce4 allows for this under Settings > Keyboard > Application Shortcuts.
 /usr/bin/vol_up       ==>  Increase vol by 5 %
 
 /usr/bin/vol_down     ==>  Decrease vol by 5 %
+
+
+Link to AUR package: https://aur.archlinux.org/packages/modprobed_db
