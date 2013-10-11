@@ -17,5 +17,5 @@ let line=($line + 12)
 # extract mute status from that line
 mute=$(pacmd list-sinks|awk 'NR==i"'"$line"'"{print $2}')
 
-[[ "$mute" == "yes" ]] && pacmd set-sink-mute "$sink" 0 > /dev/null 2>&1
-[[ "$mute" == "no" ]] && pacmd set-sink-mute "$sink" 1 > /dev/null 2>&1
+[[ "$mute" == "yes" ]] && pactl set-sink-mute "$sink" 0 > /dev/null 2>&1
+[[ "$mute" == "no" ]] && pactl set-sink-mute "$sink" 1 > /dev/null 2>&1

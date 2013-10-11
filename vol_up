@@ -15,8 +15,6 @@ let line=$(pacmd list-sinks|grep -n $sink|sed '{s/://}'|awk '{print $1}')
 let line=($line + 6)
 volume=$(pacmd list-sinks|awk 'NR=="'"$line"'"{print $3}'|sed '{s/%//}')
 
-# pacmd returns volume as %, but demands setting as range: 0-65535
-let volume=($volume * 65536);let volume=($volume / 100)
-let volume=($volume + 3276)
-[[ $volume -gt 65536 ]] && let volume=65536
-pacmd set-sink-volume $sink $volume > /dev/null 2>&1
+# set vol up by 5% steps
+[[ $volume -gt 100 ]] && let volume=100
+pactl set-sink-volume "$sink" -- +5%
