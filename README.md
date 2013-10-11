@@ -3,7 +3,7 @@ Simple bash script to allow for control of pulseaudio without alsautils. Simply 
 
 	/usr/bin/pulseaudio-ctl mute  ==>  Toggle status of mute
 	/usr/bin/pulseaudio-ctl up    ==>  Increase vol by 5 %
-	/usr/bin/pulseaudio-ctl do    ==>  Decrease vol by 5 %
+	/usr/bin/pulseaudio-ctl down  ==>  Decrease vol by 5 %
 
 ## Links
 AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
