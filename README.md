@@ -1,10 +1,9 @@
-# Pulseaudio_ctl
-Simple bash scripts to allow for control of pulseaudio with alsautils. Simply map the following scripts to keyboard shortcuts in your DE or WM. Xfce4 allows for this under Settings > Keyboard > Application Shortcuts.
+# Pulseaudio-ctl
+Simple bash script to allow for control of pulseaudio without alsautils. Simply map the following to keyboard shortcuts in your DE or WM. Xfce4 allows for this under Settings > Keyboard > Application Shortcuts.
 
-
-	/usr/bin/mute_toggle  ==>  Toggle status of mute
-	/usr/bin/vol_up       ==>  Increase vol by 5 %
-	/usr/bin/vol_down     ==>  Decrease vol by 5 %
+	/usr/bin/pulseaudio-ctl mute  ==>  Toggle status of mute
+	/usr/bin/pulseaudio-ctl up    ==>  Increase vol by 5 %
+	/usr/bin/pulseaudio-ctl do    ==>  Decrease vol by 5 %
 
 ## Links
-AUR package: https://aur.archlinux.org/packages/modprobed_db
+AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
