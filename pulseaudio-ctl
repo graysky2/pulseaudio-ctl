@@ -26,15 +26,14 @@ echo "I require pactl but it's not installed. Aborting." >&2
 exit 1; }
 
 setup() {
-	#SINK=$(pactl info|grep "Default Sink"|awk '{print $3}')
 	SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
 	MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
 	CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: 0:/{ print $3 }'|sed 's/%//')
 
-	if [[ "$CURVOL" =~ ^[0-9]+$ ]]; then
+	if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
 		return 0
 	else
-		# the git snapshot at the time of writing this script chances the
+		# the git snapshot at the time of writing this script changes the
 		# expected output of this cmd
 		CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume:/{ print $5 }' | sed 's/%//g')
 	fi
