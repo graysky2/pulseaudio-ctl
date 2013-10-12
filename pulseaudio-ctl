@@ -8,7 +8,7 @@
 # by graysky
 # https://github.com/graysky2/pulseaudio-ctl
 
-export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m"
+export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
 command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
@@ -28,6 +28,8 @@ exit 1; }
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" || 
+  MUTED="${NRM}${GRN}$MUTED${NRM}"
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: 0:/{ print $3 }'|sed 's/%//')
 
   if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
@@ -71,7 +73,7 @@ case "$1" in
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
     echo
     echo -e " ${BLD}Volume level  : ${NRM}${RED}$CURVOL %${NRM}"
-    echo -e " ${BLD}Is sink muted : ${NRM}${RED}$MUTED${NRM}"
+    echo -e " ${BLD}Is sink muted : $MUTED"
     exit 0
     ;;
 esac
