@@ -35,7 +35,13 @@ setup() {
 	else
 		# the git snapshot at the time of writing this script changes the
 		# expected output of this cmd
-		CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume:/{ print $5 }' | sed 's/%//g')
+		CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+		if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
+			return 0
+		else
+			echo -e " ${BLD}${RED}Cannot find current volume. CURVOL = ${CURVOL}${NRM}"
+			exit 1
+		fi
 	fi
 }
 
@@ -43,14 +49,14 @@ case "$1" in
 	U|u|[U,u]p)
 		# raise volume by 5%
 		setup
-		[[ $CURVOL -ge 100 ]] && exit 0 ||
-		pactl set-sink-volume "$SINK" -- +5%
+		[[ "$CURVOL" -ge 100 ]] && exit 0 ||
+			pactl set-sink-volume "$SINK" -- +5%
 		;;
 	D|d|[D,d]own|[D,d]o)
 		# lowers volume by 5%
 		setup
-		[[ $CURVOL -le 0 ]] && exit 0 ||
-		pactl set-sink-volume "$SINK" -- -5%
+		[[ "$CURVOL" -le 0 ]] && exit 0 ||
+			pactl set-sink-volume "$SINK" -- -5%
 		;;
 	M|m|[M,m]u|[M,m]ute)
 		# mutes the volume entirely
