@@ -22,7 +22,7 @@ echo "I require pactl but it's not installed. Aborting." >&2
 exit 1; }
 
 command -v pacmd >/dev/null 2>&1 || {
-echo "I require pactl but it's not installed. Aborting." >&2
+echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
 
 setup() {
