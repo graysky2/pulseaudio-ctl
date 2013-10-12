@@ -1,7 +1,14 @@
 #!/bin/bash
-# Inspiration to Roland Latour who wrote most of this script
-# http://www.freak-search.com/en/thread/4707111/q_volume_control,_xfce
+#
+# pulseaudio-ctl
+#
+# simple control of pulseaudio vol+/vol-/mute from the shell
+# or more practically, from DE shortcut keys
+#
+# by graysky
+# https://github.com/graysky2/pulseaudio-ctl
 
+export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m"
 command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
@@ -18,54 +25,48 @@ command -v pacmd >/dev/null 2>&1 || {
 echo "I require pactl but it's not installed. Aborting." >&2
 exit 1; }
 
-export BLD="\e[01m" BLU="\e[01;34m" NRM="\e[00m"
+setup() {
+	#SINK=$(pactl info|grep "Default Sink"|awk '{print $3}')
+	SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
+	MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+	CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: 0:/{ print $3 }'|sed 's/%//')
 
-#find default sink
-sink=$(pacmd info|grep "Default sink name"|awk '{print $4}')
-
-# find volume of default sink
-# get line# of start of definition for default sink (plus 1, actually)
-let line=$(pacmd list-sinks|grep -n $sink|sed '{s/://}'|awk '{print $1}')
+	if [[ "$CURVOL" =~ ^[0-9]+$ ]]; then
+		return 0
+	else
+		# the git snapshot at the time of writing this script chances the
+		# expected output of this cmd
+		CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume:/{ print $5 }' | sed 's/%//g')
+	fi
+}
 
 case "$1" in
 	U|u|[U,u]p)
 		# raise volume by 5%
-		# index down a bit for volume line
-		let line=($line + 6)
-
-		volume=$(pacmd list-sinks|awk 'NR=="'"$line"'"{print $3}'|sed '{s/%//}')
-
-		[[ $volume -gt 100 ]] && volume=100 && exit 0
-		pactl set-sink-volume "$sink" -- +5%
+		setup
+		[[ $CURVOL -ge 100 ]] && exit 0 ||
+		pactl set-sink-volume "$SINK" -- +5%
 		;;
 	D|d|[D,d]own|[D,d]o)
 		# lowers volume by 5%
-		# index down a bit for volume line
-		let line=($line + 6)
-
-		volume=$(pacmd list-sinks|awk 'NR=="'"$line"'"{print $3}'|sed '{s/%//}')
-
-		[[ $volume -lt 0 ]] && volume=0 && exit 0
-		pactl set-sink-volume "$sink" -- -5%
+		setup
+		[[ $CURVOL -le 0 ]] && exit 0 ||
+		pactl set-sink-volume "$SINK" -- -5%
 		;;
 	M|m|[M,m]u|[M,m]ute)
 		# mutes the volume entirely
-		# add 12 for "muted" line
-		let line=($line + 12)
-
-		mute=$(pacmd list-sinks|awk 'NR==i"'"$line"'"{print $2}')
-
-		# backwards-compatibility fix by WOFall
-		[[ "$mute" == "request:" ]] && pactl set-sink-mute "$sink" toggle > /dev/null 2>&1
-
-		[[ "$mute" == "yes" ]] && pactl set-sink-mute "$sink" 0 > /dev/null 2>&1
-		[[ "$mute" == "no" ]] && pactl set-sink-mute "$sink" 1 > /dev/null 2>&1
+		setup
+		pactl set-sink-mute "$SINK" toggle
 		;;
 	*)
+		setup
 		echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute}${NRM}"
 		echo
 		echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
 		echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
+		echo
+		echo -e " ${BLD}Volume level  : ${NRM}${RED}$CURVOL %${NRM}"
+		echo -e " ${BLD}Is sink muted : ${NRM}${RED}$MUTED${NRM}"
 		exit 0
 		;;
 esac
