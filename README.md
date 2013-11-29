@@ -1,12 +1,14 @@
+# pulseaudio conrtol for awesome window manager
+99% based on a fork from graysky2, awesome WM stuff based on work from farhavens http://awesome.naquadah.org/wiki/Farhavens_volume_widget
+
+
 # Pulseaudio-ctl
 Simple bash script to allow for control of pulseaudio without alsautils. Simply map the following to keyboard shortcuts in your DE or WM. Xfce4 allows for this under Settings > Keyboard > Application Shortcuts.
 
 	/usr/bin/pulseaudio-ctl mute  ==>  Toggle status of mute
 	/usr/bin/pulseaudio-ctl up    ==>  Increase vol by 5 %
 	/usr/bin/pulseaudio-ctl down  ==>  Decrease vol by 5 %
-
-## Links
-AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
+	/usr/bin/pulseaudio-ctl status==>  show short status, easier to parse
 
 ## for awesome window manager volume control with status mode
 
