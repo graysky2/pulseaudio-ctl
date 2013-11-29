@@ -67,6 +67,11 @@ case "$1" in
     setup
     pactl set-sink-mute "$SINK" toggle
     ;;
+  status)
+    setup
+    echo -e "muted : $MUTED"
+    echo -e "$CURVOL %"
+    ;;
   *)
     setup
     echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute}${NRM}"
