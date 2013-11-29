@@ -9,6 +9,8 @@
 # https://github.com/graysky2/pulseaudio-ctl
 
 export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
+[ -t 1 ] || export BLD="\e[01m" BLU="" RED="" NRM="" GRN=""
+
 command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
@@ -64,6 +66,11 @@ case "$1" in
     # mutes the volume entirely
     setup
     pactl set-sink-mute "$SINK" toggle
+    ;;
+  status)
+    setup
+    echo -e "muted : $MUTED"
+    echo -e "$CURVOL %"
     ;;
   *)
     setup
