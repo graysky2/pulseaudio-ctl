@@ -27,9 +27,13 @@ exit 1; }
 
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
+  SOURCE=$(pacmd list-sources|awk '/* index:/{ print $3 }')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" || 
   MUTED="${NRM}${GRN}$MUTED${NRM}"
+  SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" || 
+  SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: 0:/{ print $3 }'|sed 's/%//')
 
   if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
@@ -65,15 +69,22 @@ case "$1" in
     setup
     pactl set-sink-mute "$SINK" toggle
     ;;
+  [M,m]i|[M,m]ute-[I,i]nput)
+    # mutes the microphone entirely
+    setup
+    pactl set-source-mute "$SOURCE" toggle
+    ;;
   *)
     setup
-    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute}${NRM}"
+    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input}${NRM}"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off.${NRM}"
     echo
-    echo -e " ${BLD}Volume level  : ${NRM}${RED}$CURVOL %${NRM}"
-    echo -e " ${BLD}Is sink muted : $MUTED"
+    echo -e " ${BLD}Volume level    : ${NRM}${RED}$CURVOL %${NRM}"
+    echo -e " ${BLD}Is sink muted   : $MUTED"
+    echo -e " ${BLD}Is source muted : $SOURCE_MUTED"
     exit 0
     ;;
 esac
