@@ -74,13 +74,30 @@ case "$1" in
     setup
     pactl set-source-mute "$SOURCE" toggle
     ;;
+  set)
+    setup
+    NEWVOL="${2%%%}"
+    [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
+      [[ "$NEWVOL" -le 0 ]] && exit 0 ||
+      pactl set-sink-volume "$SINK" -- $NEWVOL%
+    ;;
+  atmost)
+    setup
+    NEWVOL="${2%%%}"
+    [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
+      [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
+      [[ "$NEWVOL" -le 0 ]] && exit 0 ||
+      pactl set-sink-volume "$SINK" -- $NEWVOL%
+    ;;
   *)
     setup
-    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input}${NRM}"
+    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off.${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} takes a % value.${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect is current volume is higher than this.${NRM}"
     echo
     echo -e " ${BLD}Volume level    : ${NRM}${RED}$CURVOL %${NRM}"
     echo -e " ${BLD}Is sink muted   : $MUTED"
