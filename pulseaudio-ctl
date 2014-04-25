@@ -91,7 +91,7 @@ case "$1" in
     ;;
   *)
     setup
-    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
+    echo -e " ${BLD}$(basename $0) ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
