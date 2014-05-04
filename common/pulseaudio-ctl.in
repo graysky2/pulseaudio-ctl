@@ -8,6 +8,10 @@
 # by graysky
 # https://github.com/graysky2/pulseaudio-ctl
 
+VERS="@VERSION@"
+SKEL="/usr/share/pulseaudio-ctl/config.skel"
+CONFIG="$HOME/.config/pulseaudio-ctl/config"
+
 export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
 command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
@@ -25,11 +29,33 @@ command -v pacmd >/dev/null 2>&1 || {
 echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
 
-USER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
+makeconfig() {
+  if [[ ! -f "$SKEL" ]]; then
+    echo -e "${RED}$SKEL is missing. Reinstall this package to continue."${NRM}
+    exit 1
+  fi
 
-if [[ -f $USER_CONFIG ]]; then
-  source $USER_CONFIG;
-fi
+  if [[ ! -f "$CONFIG" ]]; then
+    echo -e ${BLD}'------------------------------------------------------------'${NRM}
+    echo -e ${BLD}' No config file found so creating a fresh one in:'${NRM}
+    echo -e ${BLD}${BLUE}" $CONFIG"${NRM}
+    echo
+    echo -e ${BLD}" Edit this file if desired."${NRM}
+    echo -e ${BLD}'------------------------------------------------------------'${NRM}
+    install -Dm644 "$SKEL" "$CONFIG"
+  fi
+}
+
+checkconfig() {
+  if [[ ! -f "$CONFIG" ]]; then
+    makeconfig
+  else
+    source "$CONFIG"
+    # TODO: add check for integer number
+
+    [[ -z "$UPPER_THRESHOLD" ]] && UPPER_THRESHOLD=100
+  fi
+}
 
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
@@ -40,28 +66,18 @@ setup() {
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" || 
   SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
-  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: 0:/{ print $3 }'|sed 's/%//')
 
-  if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
-    return 0
-  else
-    # the git snapshot at the time of writing this script changes the
-    # expected output of this cmd
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    if [ "$CURVOL" -ge 0 -o "$CURVOL" -lt 0 2>/dev/null ]; then
-      return 0
-    else
-      echo -e " ${BLD}${RED}Cannot find current volume. CURVOL = ${CURVOL}${NRM}"
-      exit 1
-    fi
-  fi
+  # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
+  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
 }
 
+checkconfig
 setup
 case "$1" in
   U|u|[U,u]p)
-    # raise volume by 5%
-    [[ "$CURVOL" -ge ${UPPER_THRESHOLD:-100} ]] && exit 0 ||
+    # raise volume by 5% or set it to the upper threshold
+    # in cases where external apps have pushed it above
+    [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
       pactl set-sink-volume "$SINK" -- +5%
     ;;
   D|d|[D,d]own|[D,d]o)
@@ -79,14 +95,14 @@ case "$1" in
     ;;
   set)
     NEWVOL="${2%%%}"
-    [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
+    [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     ;;
   atmost)
     NEWVOL="${2%%%}"
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
-      [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
+      [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     ;;
