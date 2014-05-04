@@ -51,38 +51,33 @@ setup() {
   fi
 }
 
+setup
 case "$1" in
   U|u|[U,u]p)
     # raise volume by 5%
-    setup
     [[ "$CURVOL" -ge 100 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- +5%
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by 5%
-    setup
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- -5%
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
-    setup
     pactl set-sink-mute "$SINK" toggle
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
-    setup
     pactl set-source-mute "$SOURCE" toggle
     ;;
   set)
-    setup
     NEWVOL="${2%%%}"
     [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     ;;
   atmost)
-    setup
     NEWVOL="${2%%%}"
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
       [[ "$NEWVOL" -ge 100 ]] && exit 0 ||
@@ -90,7 +85,6 @@ case "$1" in
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     ;;
   *)
-    setup
     echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
