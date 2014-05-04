@@ -19,10 +19,5 @@ export UPPER_THRESHOLD=150
 
 If config file isn't present script uses default value 100.
 
-One-liner for make it work with config
-```bash
-(export TARGET_DIR="${XDG_CONFIG_HOME:-$HOME/.config/}/pulseaudio-ctl"; mkdir -p "$TARGET_DIR"; echo 'export UPPER_THRESHOLD=150' >> "${TARGET_DIR}/config")
-```
-
 ## Links
 AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
