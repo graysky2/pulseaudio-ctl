@@ -115,6 +115,8 @@ case "$1" in
     echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} takes a % value.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect is current volume is higher than this.${NRM}"
     echo
+    echo -e " ${BLD}Optionally, redefine an upper threshold in ${NRM}${BLU}$CONFIG${NRM}"
+    echo
     echo -e " ${BLD}Volume level    : ${NRM}${RED}$CURVOL %${NRM}"
     echo -e " ${BLD}Is sink muted   : $MUTED"
     echo -e " ${BLD}Is source muted : $SOURCE_MUTED"
