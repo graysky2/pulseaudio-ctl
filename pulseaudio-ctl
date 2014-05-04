@@ -25,6 +25,12 @@ command -v pacmd >/dev/null 2>&1 || {
 echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
 
+USER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
+
+if [[ -f $USER_CONFIG ]]; then
+  source $USER_CONFIG;
+fi
+
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
   SOURCE=$(pacmd list-sources|awk '/* index:/{ print $3 }')
@@ -55,7 +61,7 @@ setup
 case "$1" in
   U|u|[U,u]p)
     # raise volume by 5%
-    [[ "$CURVOL" -ge 100 ]] && exit 0 ||
+    [[ "$CURVOL" -ge ${UPPER_THRESHOLD:-100} ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- +5%
     ;;
   D|d|[D,d]own|[D,d]o)
