@@ -8,5 +8,16 @@ Simple bash script to allow for control of pulseaudio without alsautils. Simply 
 	/usr/bin/pulseaudio-ctl set 40      ==>  Set vol to 40%
 	/usr/bin/pulseaudio-ctl atmost 30   ==>  Set vol to 30% if current higher than that
 
+## Configuration
+There is only one configurable option: `UPPER_THRESHOLD`, which should be tuned in file `config`, placed in `XDG_CONFIG_HOME` which usually is ~/.config/ in directory pulseaudio-ctl. So usually full path will be ~/.config/pulseaudio-ctl/config
+
+Example:
+```bash
+# let us increase volume up to 150%
+export UPPER_THRESHOLD=150
+```
+
+If config file isn't present script uses default value 100.
+
 ## Links
 AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
