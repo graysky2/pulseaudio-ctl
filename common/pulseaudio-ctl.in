@@ -8,9 +8,11 @@
 # by graysky
 # https://github.com/graysky2/pulseaudio-ctl
 
+# TODO: Add a check for integer values: UPPER_THRESHOLD SINK SOURCE CURVOL
+
 VERS="@VERSION@"
 SKEL="/usr/share/pulseaudio-ctl/config.skel"
-CONFIG="$HOME/.config/pulseaudio-ctl/config"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
 
 export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
 command -v sed >/dev/null 2>&1 || {
@@ -51,8 +53,6 @@ checkconfig() {
     makeconfig
   else
     source "$CONFIG"
-    # TODO: add check for integer number
-
     [[ -z "$UPPER_THRESHOLD" ]] && UPPER_THRESHOLD=100
   fi
 }
@@ -60,15 +60,16 @@ checkconfig() {
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
   SOURCE=$(pacmd list-sources|awk '/* index:/{ print $3 }')
-  MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-  [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" || 
-  MUTED="${NRM}${GRN}$MUTED${NRM}"
-  SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-  [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" || 
-  SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
-
+  # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+  
+  MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||
+    MUTED="${NRM}${GRN}$MUTED${NRM}"
+  SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" ||
+    SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
 }
 
 checkconfig
