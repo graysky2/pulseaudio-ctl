@@ -8,12 +8,9 @@
 # by graysky
 # https://github.com/graysky2/pulseaudio-ctl
 
-# TODO: Add a check for integer values: UPPER_THRESHOLD SINK SOURCE CURVOL
-
 VERS="@VERSION@"
 SKEL="/usr/share/pulseaudio-ctl/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
-UPPER_THRESHOLD_DEFAULT=100
 
 export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
 command -v sed >/dev/null 2>&1 || {
@@ -33,7 +30,7 @@ echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
 
 is_integer() {
-  if [[ $1 =~ ^[0-9]+$ ]]; then
+  if [[ "$1" =~ ^[0-9]+$ ]]; then
     echo 1;
   else
     echo 0;
@@ -62,10 +59,10 @@ checkconfig() {
     makeconfig
   else
     source "$CONFIG"
-    if ! [[ -z "$UPPER_THRESHOLD" ]]; then
-      [[ $(is_integer "$UPPER_THRESHOLD") == '1' ]] || UPPER_THRESHOLD=$UPPER_THRESHOLD_DEFAULT
+    if [[ -n "$UPPER_THRESHOLD" ]]; then
+      [[ $(is_integer "$UPPER_THRESHOLD") == '1' ]] || UPPER_THRESHOLD=100
     else
-      UPPER_THRESHOLD=$UPPER_THRESHOLD_DEFAULT
+      UPPER_THRESHOLD=100
     fi
   fi
 }
@@ -83,6 +80,25 @@ setup() {
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" ||
     SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
+
+  # check that extracted vars are integers
+  if [[ -n "$SINK" ]]; then
+    [[ $(is_integer "$SINK") == '1' ]] || echo -e "${RED}Cannot determine default sink."${NRM}
+  else
+    return 0
+  fi
+
+  if [[ -n "$SOURCE" ]]; then
+    [[ $(is_integer "$SOURCE") == '1' ]] || echo -e "${RED}Cannot determine default source."${NRM}
+  else
+    return 0
+  fi
+
+  if [[ -n "$CURVOL" ]]; then
+    [[ $(is_integer "$CURVOL") == '1' ]] || echo -e "${RED}Cannot determine current volume."${NRM}
+  else
+    return 0
+  fi
 }
 
 checkconfig
