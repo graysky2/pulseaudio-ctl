@@ -13,6 +13,7 @@
 VERS="@VERSION@"
 SKEL="/usr/share/pulseaudio-ctl/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
+UPPER_THRESHOLD_DEFAULT=100
 
 export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
 command -v sed >/dev/null 2>&1 || {
@@ -30,6 +31,14 @@ exit 1; }
 command -v pacmd >/dev/null 2>&1 || {
 echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
+
+is_integer() {
+  if [[ $1 =~ ^[0-9]+$ ]]; then
+    echo 1;
+  else
+    echo 0;
+  fi
+}
 
 makeconfig() {
   if [[ ! -f "$SKEL" ]]; then
@@ -53,7 +62,11 @@ checkconfig() {
     makeconfig
   else
     source "$CONFIG"
-    [[ -z "$UPPER_THRESHOLD" ]] && UPPER_THRESHOLD=100
+    if ! [[ -z "$UPPER_THRESHOLD" ]]; then
+      [[ $(is_integer "$UPPER_THRESHOLD") == '1' ]] || UPPER_THRESHOLD=$UPPER_THRESHOLD_DEFAULT
+    else
+      UPPER_THRESHOLD=$UPPER_THRESHOLD_DEFAULT
+    fi
   fi
 }
 
