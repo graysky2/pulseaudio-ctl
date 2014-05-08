@@ -81,6 +81,7 @@ setup() {
   [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" ||
     SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
 
+  # check that extracted vars are integers
   declare -A VARS_TO_CHECK
   VARS_TO_CHECK=([SINK]="default sink" [SOURCE]="default source" [CURVOL]="current volume")
   for v in "${!VARS_TO_CHECK[@]}"; do
