@@ -82,23 +82,15 @@ setup() {
     SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
 
   # check that extracted vars are integers
-  if [[ -n "$SINK" ]]; then
-    [[ $(is_integer "$SINK") == '1' ]] || echo -e "${RED}Cannot determine default sink."${NRM}
-  else
-    return 0
-  fi
-
-  if [[ -n "$SOURCE" ]]; then
-    [[ $(is_integer "$SOURCE") == '1' ]] || echo -e "${RED}Cannot determine default source."${NRM}
-  else
-    return 0
-  fi
-
-  if [[ -n "$CURVOL" ]]; then
-    [[ $(is_integer "$CURVOL") == '1' ]] || echo -e "${RED}Cannot determine current volume."${NRM}
-  else
-    return 0
-  fi
+  declare -A VARS_TO_CHECK
+  VARS_TO_CHECK=([SINK]="default sink" [SOURCE]="default source" [CURVOL]="current volume")
+  for v in "${!VARS_TO_CHECK[@]}"; do
+    if [[ -n "${!v}" ]]; then
+      [[ $(is_integer "${!v}") == '1' ]] || echo -e "${RED}Cannot determine ${VARS_TO_CHECK[$v]}."${NRM}
+    else
+      return 0
+    fi
+  done
 }
 
 checkconfig
