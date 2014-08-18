@@ -134,7 +134,7 @@ case "$1" in
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off.${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} takes a % value.${NRM}"
-    echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect is current volume is higher than this.${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect if current volume is higher than this.${NRM}"
     echo
     echo -e " ${BLD}Optionally, redefine an upper threshold in ${NRM}${BLU}$CONFIG${NRM}"
     echo
