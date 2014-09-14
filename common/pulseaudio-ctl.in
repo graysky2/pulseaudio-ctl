@@ -70,6 +70,7 @@ checkconfig() {
 setup() {
   SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
   SOURCE=$(pacmd list-sources|awk '/* index:/{ print $3 }')
+  PAVERSION=$(pulseaudio --version| sed 's/pulseaudio //')
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
@@ -138,9 +139,12 @@ case "$1" in
     echo
     echo -e " ${BLD}Optionally, redefine an upper threshold in ${NRM}${BLU}$CONFIG${NRM}"
     echo
-    echo -e " ${BLD}Volume level    : ${NRM}${RED}$CURVOL %${NRM}"
-    echo -e " ${BLD}Is sink muted   : $MUTED"
-    echo -e " ${BLD}Is source muted : $SOURCE_MUTED"
+    echo -e " ${BLD}Volume level     : ${NRM}${RED}$CURVOL %${NRM}"
+    echo -e " ${BLD}Is sink muted    : $MUTED"
+    echo -e " ${BLD}Is source muted  : $SOURCE_MUTED"
+    echo -e " ${BLD}Detected sink    : ${NRM}${BLUE}$SINK${NRM}"
+    echo -e " ${BLD}Detected source  : ${NRM}${BLUE}$SOURCE${NRM}"
+    echo -e " ${BLD}Pulse version    : ${NRM}${BLUE}$PAVERSION${NRM}"
     exit 0
     ;;
 esac
