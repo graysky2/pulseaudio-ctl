@@ -46,7 +46,7 @@ makeconfig() {
   if [[ ! -f "$CONFIG" ]]; then
     echo -e ${BLD}'------------------------------------------------------------'${NRM}
     echo -e ${BLD}' No config file found so creating a fresh one in:'${NRM}
-    echo -e ${BLD}${BLUE}" $CONFIG"${NRM}
+    echo -e ${BLD}${BLU}" $CONFIG"${NRM}
     echo
     echo -e ${BLD}" Edit this file if desired."${NRM}
     echo -e ${BLD}'------------------------------------------------------------'${NRM}
@@ -142,9 +142,9 @@ case "$1" in
     echo -e " ${BLD}Volume level     : ${NRM}${RED}$CURVOL %${NRM}"
     echo -e " ${BLD}Is sink muted    : $MUTED"
     echo -e " ${BLD}Is source muted  : $SOURCE_MUTED"
-    echo -e " ${BLD}Detected sink    : ${NRM}${BLUE}$SINK${NRM}"
-    echo -e " ${BLD}Detected source  : ${NRM}${BLUE}$SOURCE${NRM}"
-    echo -e " ${BLD}Pulse version    : ${NRM}${BLUE}$PAVERSION${NRM}"
+    echo -e " ${BLD}Detected sink    : ${NRM}${BLU}$SINK${NRM}"
+    echo -e " ${BLD}Detected source  : ${NRM}${BLU}$SOURCE${NRM}"
+    echo -e " ${BLD}Pulse version    : ${NRM}${BLU}$PAVERSION${NRM}"
     exit 0
     ;;
 esac
