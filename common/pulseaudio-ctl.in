@@ -75,9 +75,11 @@ setup() {
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$MUTED" = "yes" ]] && MUTED_FLAG=1 || MUTED_FLAG=0
   [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||
     MUTED="${NRM}${GRN}$MUTED${NRM}"
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED_FLAG=1 || SOURCE_MUTED_FLAG=0
   [[ "$SOURCE_MUTED" = "yes" ]] && SOURCE_MUTED="${NRM}${RED}$SOURCE_MUTED${NRM}" ||
     SOURCE_MUTED="${NRM}${GRN}$SOURCE_MUTED${NRM}"
 
@@ -109,11 +111,13 @@ case "$1" in
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
-    pactl set-sink-mute "$SINK" toggle
+    [ $MUTED_FLAG = 0 ] && TOGGLE=1 || TOGGLE=0
+    pactl set-sink-mute "$SINK" $TOGGLE
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
-    pactl set-source-mute "$SOURCE" toggle
+    [ $SOURCE_MUTED_FLAG = 0 ] && TOGGLE=1 || TOGGLE=0
+    pactl set-source-mute "$SOURCE" $TOGGLE
     ;;
   set)
     NEWVOL="${2%%%}"
