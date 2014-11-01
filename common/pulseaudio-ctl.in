@@ -73,6 +73,7 @@ setup() {
   PAVERSION=$(pulseaudio --version| sed 's/pulseaudio //')
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
+  # pactl 2.0 does not have 'front'
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   [[ "$MUTED" = "yes" ]] && MUTED_FLAG=1 || MUTED_FLAG=0
@@ -106,7 +107,8 @@ case "$1" in
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by 5%
-    [[ "$CURVOL" -le 0 ]] && exit 0 ||
+    # woraround for empty CURVOL:
+    # [[ "$CURVOL" -le 0 ]] && (echo 'wha..' ; exit 0) ||
       pactl set-sink-volume "$SINK" -- -5%
     ;;
   M|m|[M,m]u|[M,m]ute)
