@@ -68,8 +68,8 @@ checkconfig() {
 }
 
 setup() {
-  SINK=$(pacmd list-sinks|awk '/* index:/{ print $3 }')
-  SOURCE=$(pacmd list-sources|awk '/* index:/{ print $3 }')
+  SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+  SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
   PAVERSION=$(pulseaudio --version| sed 's/pulseaudio //')
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
