@@ -1,4 +1,4 @@
-VERSION = 1.43
+VERSION = 1.44
 PN = pulseaudio-ctl
 
 PREFIX ?= /usr
@@ -12,7 +12,7 @@ all:
 	$(Q)sed -e 's/@VERSION@/'$(VERSION)'/' common/$(PN).in >common/$(PN)
 
 clean:
-	$(RM) common/$(PN)
+	$(RM) -f common/$(PN)
 
 install-bin:
 	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
@@ -25,3 +25,4 @@ uninstall:
 
 install: install-bin
 
+.PHONY: clean install-bin uninstall
