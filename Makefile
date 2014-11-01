@@ -11,6 +11,9 @@ all:
 	$(Q)echo -e '\033[1;32mSetting version\033[0m'
 	$(Q)sed -e 's/@VERSION@/'$(VERSION)'/' common/$(PN).in >common/$(PN)
 
+clean:
+	$(RM) common/$(PN)
+
 install-bin:
 	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
@@ -21,3 +24,4 @@ uninstall:
 	$(Q)$(RM) -rf "$(DESTDIR)$(SKELDIR)"
 
 install: install-bin
+
