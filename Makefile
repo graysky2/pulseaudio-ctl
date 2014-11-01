@@ -1,7 +1,7 @@
 VERSION = 1.43
 PN = pulseaudio-ctl
 
-PREFIX ?= /usr
+PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
 SKELDIR = $(PREFIX)/share/$(PN)
 RM = rm
