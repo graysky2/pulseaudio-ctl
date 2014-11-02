@@ -12,12 +12,21 @@ Simple bash script to allow for control of pulseaudio without alsautils. Simply 
 Works with pulseaudio version 5 but not with version 4.
 
 ## Configuration
-There is only one configurable option: `UPPER_THRESHOLD`, which should be tuned in file `config`, placed in `XDG_CONFIG_HOME` which usually is ~/.config/ in directory pulseaudio-ctl. So usually full path will be ~/.config/pulseaudio-ctl/config
+A config file resides in ~/.config/pulseaudio-ctl/config and allows for some options including:
 
 Example:
 ```bash
-# let us increase volume up to 150%
-export UPPER_THRESHOLD=150
+# The default setting is for pulseaudio-ctl to NOT increase to volume level
+# above 100 % but Some users may wish exceed this level. If this describes
+# your use case, uncomment the UPPER_THRESHOLD variable below setting it to
+# the new upper threshold.
+# 
+UPPER_THRESHOLD=150
+
+# Push output through libnotify. Set to any value to enable this feature
+# and note that you must have /usr/bin/notify-send to use this. On Arch
+# libnotify provides this. Other distros may not name it as such.
+NOTIFY=yes
 ```
 
 If config file isn't present script uses default value 100.
