@@ -1,8 +1,9 @@
-VERSION = 1.44
+VERSION = 1.45
 PN = pulseaudio-ctl
 
 PREFIX ?= /usr
 BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/share/man/man1
 SKELDIR = $(PREFIX)/share/$(PN)
 RM = rm
 Q = @
@@ -19,10 +20,16 @@ install-bin:
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
 	install -Dm644 common/$(PN).conf.skel "$(DESTDIR)$(SKELDIR)/config.skel"
 
+install-man:
+	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'
+	install -Dm644 doc/$(PN).1 "$(DESTDIR)$(MANDIR)/$(PN).1"
+	gzip -9 "$(DESTDIR)$(MANDIR)/$(PN).1"
+
 uninstall:
 	$(RM) "$(DESTDIR)$(BINDIR)/$(PN)"
-	$(Q)$(RM) -rf "$(DESTDIR)$(SKELDIR)"
+	$(RM) "$(DESTDIR)$(MANDIR)/$(PN).1.gz"
+	$(RM) -rf "$(DESTDIR)$(SKELDIR)"
 
-install: install-bin
+install: install-bin install-man
 
-.PHONY: clean install-bin uninstall
+.PHONY: clean install-bin install-man uninstall
