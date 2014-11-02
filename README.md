@@ -20,7 +20,7 @@ Example:
 # above 100 % but Some users may wish exceed this level. If this describes
 # your use case, uncomment the UPPER_THRESHOLD variable below setting it to
 # the new upper threshold.
-# 
+#
 UPPER_THRESHOLD=150
 
 # Push output through libnotify. Set to any value to enable this feature
@@ -29,7 +29,7 @@ UPPER_THRESHOLD=150
 NOTIFY=yes
 ```
 
-If config file isn't present script uses default value 100.
+If config file isn't present script uses default value 100 for the UPPER_THRESHOLD and notifications are disabled by default.
 
 ## Links
 AUR package: https://aur.archlinux.org/packages/pulseaudio-ctl
