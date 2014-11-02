@@ -129,6 +129,8 @@ case "$1" in
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     ;;
   *)
+    echo -e "${BLD}pulseaudio-ctl v$VERS${NRM}"
+    echo
     echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments.${NRM}"
