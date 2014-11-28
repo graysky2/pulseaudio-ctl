@@ -110,26 +110,30 @@ case "$1" in
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
       pactl set-sink-volume "$SINK" -- +5%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "volume up" "level: $CURVOL"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "volume up" "level: $CURVOL" --icon=multimedia-volume-control
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by 5%
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- -5%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "volume down" "level: $CURVOL"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "volume down" "level: $CURVOL" --icon=multimedia-volume-control
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
     pactl set-sink-mute "$SINK" toggle
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $MUTED"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $MUTED" --icon=audio-volume-muted
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
     pactl set-source-mute "$SOURCE" toggle
     SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $SOURCE_MUTED"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $SOURCE_MUTED" --icon=audio-volume-muted
     ;;
   set)
     NEWVOL="${2%%%}"
@@ -137,7 +141,8 @@ case "$1" in
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "volume set" "level: $CURVOL"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "volume set" "level: $CURVOL" --icon=multimedia-volume-control
     ;;
   atmost)
     NEWVOL="${2%%%}"
@@ -146,7 +151,8 @@ case "$1" in
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] && notify-send -t 1000 --hint=int:transient:1 "atmost set" "level: $CURVOL"
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "atmost set" "level: $CURVOL" --icon=multimedia-volume-control
     ;;
   *)
     echo -e "${BLD}pulseaudio-ctl v$VERS${NRM}"

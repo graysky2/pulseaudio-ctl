@@ -1,4 +1,4 @@
-VERSION = 1.45
+VERSION = 1.46
 PN = pulseaudio-ctl
 
 PREFIX ?= /usr
@@ -18,7 +18,7 @@ clean:
 install-bin:
 	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
-	install -Dm644 common/$(PN).conf.skel "$(DESTDIR)$(SKELDIR)/config.skel"
+	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
 
 install-man:
 	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'

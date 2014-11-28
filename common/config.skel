@@ -1,5 +1,5 @@
 #
-# $HOME/.config/pulseaudio-ctl/pulseaudio-ctl.conf
+# $HOME/.config/pulseaudio-ctl/config
 #
 
 # The default setting is for pulseaudio-ctl to NOT increase to volume level
