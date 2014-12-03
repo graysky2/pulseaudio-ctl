@@ -125,10 +125,6 @@ case "$1" in
     # mutes the volume entirely
     pactl set-sink-mute "$SINK" toggle
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-    if [ "$MUTED" == "yes" ]; then LEVEL='muted'; CURVOL=0;
-    elif [ "$CURVOL" -lt 20 ]; then LEVEL='low';
-    elif [ "$CURVOL" -lt 40 ]; then LEVEL='medium';
-    elif [ "$CURVOL" -lt 60 ]; then LEVEL='high'; fi
     [[ -n "$NOTIFY" ]] &&
       notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $MUTED" --icon=audio-volume-muted
     ;;
