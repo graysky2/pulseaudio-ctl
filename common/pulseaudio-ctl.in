@@ -111,7 +111,7 @@ case "$1" in
       pactl set-sink-volume "$SINK" -- +5%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ -n "$NOTIFY" ]] &&
-      notify-send -t 1000 --hint=int:transient:1 "volume up" "level: $CURVOL" --icon=multimedia-volume-control
+      notify-send -t 1000 -i multimedia-volume-control -h int:transient:1 -h int:value:$CURVOL -h string:synchronous:volume "volume up" ""
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by 5%
@@ -119,14 +119,18 @@ case "$1" in
       pactl set-sink-volume "$SINK" -- -5%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ -n "$NOTIFY" ]] &&
-      notify-send -t 1000 --hint=int:transient:1 "volume down" "level: $CURVOL" --icon=multimedia-volume-control
+      notify-send -t 1000 -i multimedia-volume-control -h int:transient:1 -h int:value:$CURVOL -h string:synchronous:volume "volume down" ""
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
     pactl set-sink-mute "$SINK" toggle
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+    if [ "$MUTED" == "yes" ]; then LEVEL='muted'; CURVOL=0;
+    elif [ "$CURVOL" -lt 20 ]; then LEVEL='low';
+    elif [ "$CURVOL" -lt 40 ]; then LEVEL='medium';
+    elif [ "$CURVOL" -lt 60 ]; then LEVEL='high'; fi
     [[ -n "$NOTIFY" ]] &&
-      notify-send -t 1000 --hint=int:transient:1 "mute toggle" "muted: $MUTED" --icon=audio-volume-muted
+      notify-send -t 1000 -i audio-volume-$LEVEL -h int:transient:1 -h int:value:$CURVOL -h string:synchronous:volume "mute" ""
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
