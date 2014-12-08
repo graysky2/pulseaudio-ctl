@@ -9,7 +9,6 @@ Simple bash script to allow for control of pulseaudio without alsautils. Simply 
 	/usr/bin/pulseaudio-ctl down 50     ==>  Decrease vol by 50 %
 	/usr/bin/pulseaudio-ctl set 40      ==>  Set vol to 40%
 	/usr/bin/pulseaudio-ctl atmost 30   ==>  Set vol to 30% if current higher than that
-	/usr/bin/pulseaudio-ctl status      ==>  Print stats to libnotify
 
 ## Note
 Works with pulseaudio version 5 but not with version 4.

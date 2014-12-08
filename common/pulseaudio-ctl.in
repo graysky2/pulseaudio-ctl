@@ -160,14 +160,10 @@ case "$1" in
     # useful only for scripting
     echo $CURVOL%
     ;;
-  S|s|[S,s]tatus)
-    if [[ -n "$NOTIFY" ]]; then
-      notify-send -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE\nPulse version    : $PAVERSION" --icon=multimedia-volume-control
-    else
-      echo -e ${BLD}" Must set NOTIFY=yes in ${NRM}${BLU}$CONFIG${NRM}${BLD} to use this feature."${NRM}
-     fi
-    ;;
   *)
+    # send to notify-send if enabled
+    [[ -n "$NOTIFY" ]] &&
+      notify-send -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE\nPulse version    : $PAVERSION" --icon=multimedia-volume-control
     # add pretty colors for mute status for CLI only
     [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||
       MUTED="${NRM}${GRN}$MUTED${NRM}"
@@ -184,7 +180,6 @@ case "$1" in
     echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} set the volume to [n] %${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect if current volume is higher than [n]${NRM}"
-    echo -e " ${BLD}Where ${NRM}${BLU}status${NRM}${BLD} prints the current levels to libnotify (must be enabled in config)${NRM}"
     echo
     echo -e " ${BLD}Optionally, redefine an upper threshold in ${NRM}${BLU}$CONFIG${NRM}"
     echo
