@@ -111,10 +111,11 @@ case "$1" in
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
       pactl set-sink-volume "$SINK" -- +$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] &&
+    if [[ -n "$NOTIFY" ]]; then
       [[ -n "$BARCHART" ]] &&
       notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
       notify-send -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+    fi
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by $PERC %
@@ -122,10 +123,11 @@ case "$1" in
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- -$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] &&
+    if [[ -n "$NOTIFY" ]]; then
       [[ -n "$BARCHART" ]] &&
       notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
       notify-send -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+    fi
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
