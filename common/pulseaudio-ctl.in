@@ -66,13 +66,27 @@ checkconfig() {
     fi
   fi
 
-  if [[ -n "$NOTIFY" ]]; then
-    command -v notify-send >/dev/null 2>&1 || {
-    echo "You wish to use notifications but I require notify-send but it's not installed." >&2
-    echo "Modify $CONFIG or install the package that provides it. Aborting." >&2
-    exit 1; }
-    export "$NOTIFY"
-  fi
+  case "${NOTIFY,,}" in
+    y|yes|true|t|on|1|enabled|enable|use)
+      USEN=1
+      command -v notify-send >/dev/null 2>&1 || {
+      echo "You wish to use notifications but I require notify-send but it's not installed." >&2
+      echo "Modify $CONFIG or install the package that provides it. Aborting." >&2
+      exit 1; }
+      ;;
+    *)
+      USEN=0
+      ;;
+  esac
+  
+  case "${BARCHART,,}" in
+    y|yes|true|t|on|1|enabled|enable|use)
+      USEB=1
+      ;;
+    *)
+      USEB=0
+      ;;
+  esac
 }
 
 setup() {
@@ -111,10 +125,10 @@ case "$1" in
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
       pactl set-sink-volume "$SINK" -- +$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    if [[ -n "$NOTIFY" ]]; then
-      [[ -n "$BARCHART" ]] &&
-      notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
-      notify-send -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+    if [[ $USEN -eq 1 ]]; then
+      [[ $USEB -eq 1 ]] &&
+        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
+        notify-send -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
     ;;
   D|d|[D,d]own|[D,d]o)
@@ -123,24 +137,24 @@ case "$1" in
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- -$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    if [[ -n "$NOTIFY" ]]; then
-      [[ -n "$BARCHART" ]] &&
-      notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
-      notify-send -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+    if [[ $USEN -eq 1 ]]; then
+      [[ $USEB -eq 1 ]] &&
+        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
+        notify-send -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
     pactl set-sink-mute "$SINK" toggle
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-    [[ -n "$NOTIFY" ]] &&
+    [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
     pactl set-source-mute "$SOURCE" toggle
     SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-    [[ -n "$NOTIFY" ]] &&
+    [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted
     ;;
   set)
@@ -149,7 +163,7 @@ case "$1" in
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] &&
+    [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
     ;;
   atmost)
@@ -159,7 +173,7 @@ case "$1" in
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       pactl set-sink-volume "$SINK" -- $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
-    [[ -n "$NOTIFY" ]] &&
+    [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control
     ;;
   C|c|[C,c]urrent)
@@ -168,7 +182,7 @@ case "$1" in
     ;;
   *)
     # send to notify-send if enabled
-    [[ -n "$NOTIFY" ]] &&
+    [[ $USEN -eq 1 ]] &&
       notify-send -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE\nPulse version    : $PAVERSION" --icon=multimedia-volume-control
     # add pretty colors for mute status for CLI only
     [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||

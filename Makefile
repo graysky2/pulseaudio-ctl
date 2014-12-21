@@ -1,4 +1,4 @@
-VERSION = 1.53
+VERSION = 1.54
 PN = pulseaudio-ctl
 
 PREFIX ?= /usr
