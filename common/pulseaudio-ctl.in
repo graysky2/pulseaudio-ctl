@@ -123,7 +123,7 @@ case "$1" in
     # in cases where external apps have pushed it above
     [[ "$(( $PERC + $CURVOL ))" -gt "$UPPER_THRESHOLD" ]] && PERC="$(( $UPPER_THRESHOLD - $CURVOL ))"
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
-      pactl set-sink-volume "$SINK" -- +$PERC%
+      pactl set-sink-volume "$SINK" +$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
@@ -135,7 +135,7 @@ case "$1" in
     # lowers volume by $PERC %
     [[ "$PERC" -gt "$CURVOL" ]] && PERC="$CURVOL"
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- -$PERC%
+      pactl set-sink-volume "$SINK" -$PERC%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
@@ -161,7 +161,7 @@ case "$1" in
     NEWVOL="${2%%%}"
     [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- $NEWVOL%
+      pactl set-sink-volume "$SINK" $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
@@ -171,7 +171,7 @@ case "$1" in
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
       [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- $NEWVOL%
+      pactl set-sink-volume "$SINK" $NEWVOL%
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control
