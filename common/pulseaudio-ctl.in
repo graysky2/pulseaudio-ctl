@@ -41,10 +41,10 @@ if [[ ${PAVERSION%%.*} -lt 5 ]]; then
   # error out if version is less than 5.0
   echo -e "${BLD} Sorry but $0 only supports pulseaudio version >=5.0. ${RED}Aborting."${NRM}
   exit 1
-elif [[ 1 -eq "$(echo "${PAVERSION%.*} > 5.1" | bc)" ]]; then
+elif [[ 1 -eq "$(echo "${PAVERSION} > 5.1" | bc)" ]]; then
   # version is upstream 5.99.2 or higher
   PCV=2
-elif [[ 1 -eq "$(echo "${PAVERSION%.*} < 5.1" | bc)" ]]; then
+elif [[ 1 -eq "$(echo "${PAVERSION} < 5.1" | bc)" ]]; then
   # version is upstream 5.0
   PCV=1
 fi
