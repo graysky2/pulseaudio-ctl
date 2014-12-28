@@ -12,7 +12,12 @@ VERS="@VERSION@"
 SKEL="/usr/share/pulseaudio-ctl/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
 
-export BLD="\e[01m" BLU="\e[01;34m" RED="\e[01;31m" NRM="\e[00m" GRN="\e[01;32m"
+BLD="\e[01m"
+BLU="\e[01;34m"
+RED="\e[01;31m"
+NRM="\e[00m"
+GRN="\e[01;32m"
+
 command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
@@ -28,6 +33,27 @@ exit 1; }
 command -v pacmd >/dev/null 2>&1 || {
 echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
+
+# really crude pactl version check since commands are different for different
+# versions of pactl. sorry users of PA <5
+PAVERSION=$(pactl --version | grep pactl | sed 's/^pactl //' | cut -c1-3)
+if [[ ${PAVERSION%%.*} -lt 5 ]]; then
+  # error out if version is less than 5.0
+  echo -e "${BLD} Sorry but $0 only supports pulseaudio version >=5.0. ${RED}Aborting."${NRM}
+  exit 1
+elif [[ 1 -eq "$(echo "${PAVERSION%.*} > 5.1" | bc)" ]]; then
+  # version is upstream 5.99.2 or higher
+  PCV=2
+elif [[ 1 -eq "$(echo "${PAVERSION%.*} < 5.1" | bc)" ]]; then
+  # version is upstream 5.0
+  PCV=1
+fi
+
+# stop if the above failed to set a value for PCV
+if [[ -z $PCV ]]; then
+  echo -e ${BLD}"Cannot determine which version of pactl is installed. ${RED}Aborting."${NRM}
+  exit 1
+fi
 
 is_integer() {
   if [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -92,7 +118,6 @@ checkconfig() {
 setup() {
   SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
-  PAVERSION=$(pulseaudio --version| sed 's/pulseaudio //')
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
@@ -123,7 +148,11 @@ case "$1" in
     # in cases where external apps have pushed it above
     [[ "$(( $PERC + $CURVOL ))" -gt "$UPPER_THRESHOLD" ]] && PERC="$(( $UPPER_THRESHOLD - $CURVOL ))"
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
-      pactl set-sink-volume "$SINK" -- +$PERC%
+      case "$PCV" in
+          1) pactl set-sink-volume "$SINK" -- +$PERC% ;;
+          2) pactl set-sink-volume "$SINK" +$PERC% ;;
+      esac
+
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
@@ -135,7 +164,10 @@ case "$1" in
     # lowers volume by $PERC %
     [[ "$PERC" -gt "$CURVOL" ]] && PERC="$CURVOL"
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- -$PERC%
+      case "$PCV" in
+        1) pactl set-sink-volume "$SINK" -- -$PERC% ;;
+        2) pactl set-sink-volume "$SINK" -$PERC% ;;
+      esac
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
@@ -161,7 +193,10 @@ case "$1" in
     NEWVOL="${2%%%}"
     [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- $NEWVOL%
+      case "$PCV" in
+        1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
+        2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
+      esac
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
@@ -171,7 +206,10 @@ case "$1" in
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
       [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      pactl set-sink-volume "$SINK" -- $NEWVOL%
+      case "$PCV" in
+        1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
+        2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
+      esac
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control

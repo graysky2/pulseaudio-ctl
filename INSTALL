@@ -1,10 +1,11 @@
 DEPENDENCIES
- bash
+ bash>4.0
+ bc
  coreutils
  gawk
  grep
  libpulse
- pulseaudio
+ pulseaudio>=5.0
 
 BUILDING
  Setup the via a make.
