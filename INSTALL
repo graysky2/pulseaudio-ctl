@@ -5,7 +5,7 @@ DEPENDENCIES
  gawk
  grep
  libpulse
- pulseaudio>=5.0
+ pulseaudio>=4.0
 
 BUILDING
  Setup the via a make.

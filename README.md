@@ -10,9 +10,6 @@ Simple bash script to allow for control of pulseaudio without alsautils. Simply 
 	/usr/bin/pulseaudio-ctl set 40      ==>  Set vol to 40%
 	/usr/bin/pulseaudio-ctl atmost 30   ==>  Set vol to 30% if current higher than that
 
-## Note
-Works with pulseaudio version 5 but not with version 4.
-
 ## Configuration
 A config file resides in ~/.config/pulseaudio-ctl/config and allows for some options including:
 
