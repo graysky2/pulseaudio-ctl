@@ -38,9 +38,7 @@ exit 1; }
 # versions of pactl. sorry users of PA <5
 PAVERSION=$(pactl --version | grep pactl | sed 's/^pactl //' | cut -c1-3)
 if [[ ${PAVERSION%%.*} -lt 5 ]]; then
-  # error out if version is less than 5.0
-  echo -e "${BLD} Sorry but $0 only supports pulseaudio version >=5.0. ${RED}Aborting."${NRM}
-  exit 1
+  PCV=0
 elif [[ 1 -eq "$(echo "${PAVERSION} > 5.1" | bc)" ]]; then
   # version is upstream 5.99.2 or higher
   PCV=2
@@ -120,7 +118,9 @@ setup() {
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
-  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+  [[ $PCV -eq 0 ]] && 
+  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
+    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
 
