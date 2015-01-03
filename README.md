@@ -26,6 +26,12 @@ UPPER_THRESHOLD=150
 # and note that you must have /usr/bin/notify-send to use this. On Arch
 # libnotify provides this. Other distros may not name it as such.
 NOTIFY=yes
+
+# Show a graphical progress-bar type visualization of the volume level in
+# libnotify. No setting or commented out will show a simply percentage but
+# a setting will convert the percentage to a progress-bar in libnotify.
+#
+BARCHART=yes
 ```
 
 If config file isn't present script uses default value 100 for the UPPER_THRESHOLD and notifications are disabled by default.
