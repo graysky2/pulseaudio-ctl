@@ -113,16 +113,21 @@ checkconfig() {
   esac
 }
 
-setup() {
-  SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
-  SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
+refreshcurvol() {
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] && 
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+}
+
+setup() {
+  SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+  SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  
+  refreshcurvol # sets CURVOL ahead of integer check
 
   # check that extracted vars are integers
   declare -A VARS_TO_CHECK
@@ -153,7 +158,7 @@ case "$1" in
           2) pactl set-sink-volume "$SINK" +$PERC% ;;
       esac
 
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+    refreshcurvol
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
         notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
@@ -168,7 +173,7 @@ case "$1" in
         0|1) pactl set-sink-volume "$SINK" -- -$PERC% ;;
         2) pactl set-sink-volume "$SINK" -$PERC% ;;
       esac
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+    refreshcurvol
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
         notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
@@ -197,7 +202,7 @@ case "$1" in
         0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
         2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
       esac
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+    refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
     ;;
@@ -210,7 +215,7 @@ case "$1" in
         0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
         2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
       esac
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/%//g')
+    refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control
     ;;
