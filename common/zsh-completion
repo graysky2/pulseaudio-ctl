@@ -1,0 +1,16 @@
+#compdef pulseaudio-ctl
+
+_pulseaudio-ctl() {
+  local -a options
+
+  options=('up:increase volume by 5%'
+           'down:decrease volume by 5%'
+           'mute:toggle the mute status on/off'
+           'mute-input:toggles the input status on/off'
+           'set:set the volume to [n] %'
+           'atmost:only takes effect if current volume is higher than [n]')
+           
+  _describe 'options' options
+}
+
+_pulseaudio-ctl
