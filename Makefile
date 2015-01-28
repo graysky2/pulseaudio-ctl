@@ -1,10 +1,11 @@
-VERSION = 1.59
+VERSION = 1.60
 PN = pulseaudio-ctl
 
 PREFIX ?= /usr
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/share/man/man1
 SKELDIR = $(PREFIX)/share/$(PN)
+ZSHDIR = $(PREFIX)/share/zsh/site-functions
 RM = rm
 Q = @
 
@@ -19,6 +20,8 @@ install-bin:
 	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
 	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
+	install -p -dm755 "$(DESTDIR)$(ZSHDIR)"
+	install -Dm644 common/zsh-completion "$(DESTDIR)/$(ZSHDIR)/_pulseaudio-ctl"
 
 install-man:
 	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'
@@ -29,6 +32,7 @@ uninstall:
 	$(RM) "$(DESTDIR)$(BINDIR)/$(PN)"
 	$(RM) "$(DESTDIR)$(MANDIR)/$(PN).1.gz"
 	$(RM) -rf "$(DESTDIR)$(SKELDIR)"
+	$(RM) "$(DESTDIR)/$(ZSHDIR)/_pulseaudio-ctl"
 
 install: install-bin install-man
 
