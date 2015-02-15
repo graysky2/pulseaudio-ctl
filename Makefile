@@ -35,6 +35,6 @@ uninstall:
 	$(RM) -rf "$(DESTDIR)$(SKELDIR)"
 	$(RM) "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
 
-install: install-bin install-man
+install: all install-bin install-man
 
 .PHONY: clean install-bin install-man uninstall
