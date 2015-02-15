@@ -9,13 +9,20 @@ ZSHDIR = $(PREFIX)/share/zsh/site-functions
 RM = rm
 Q = @
 
-all:
+all: common/$(PN) doc/$(PN).1.gz
+
+common/$(PN): common/$(PN).in
 	$(Q)echo -e '\033[1;32mSetting version\033[0m'
 	$(Q)sed -e 's/@VERSION@/'$(VERSION)'/' common/$(PN).in >common/$(PN)
 	$(Q)sed -i common/$(PN) -e 's|@SKELDIR@|'$(SKELDIR)'|'
 
+doc/$(PN).1.gz: doc/$(PN).1
+	$(Q)echo -e '\033[1;32mCompressing manpage\033[0m'
+	gzip -9 -c doc/$(PN).1 > doc/$(PN).1.gz
+
 clean:
 	$(RM) -f common/$(PN)
+	$(RM) -f doc/$(PN).1.gz
 
 install-bin:
 	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
@@ -26,8 +33,7 @@ install-bin:
 
 install-man:
 	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'
-	install -Dm644 doc/$(PN).1 "$(DESTDIR)$(MANDIR)/$(PN).1"
-	gzip -9 "$(DESTDIR)$(MANDIR)/$(PN).1"
+	install -Dm644 doc/$(PN).1.gz "$(DESTDIR)$(MANDIR)/$(PN).1.gz"
 
 uninstall:
 	$(RM) "$(DESTDIR)$(BINDIR)/$(PN)"
@@ -37,4 +43,4 @@ uninstall:
 
 install: all install-bin install-man
 
-.PHONY: clean install-bin install-man uninstall
+.PHONY: all clean install-bin install-man uninstall
