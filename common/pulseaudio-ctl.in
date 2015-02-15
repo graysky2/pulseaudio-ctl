@@ -9,7 +9,7 @@
 # https://github.com/graysky2/pulseaudio-ctl
 
 VERS="@VERSION@"
-SKEL="/usr/share/pulseaudio-ctl/config.skel"
+SKEL="@SKELDIR@/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
 
 BLD="\e[01m"

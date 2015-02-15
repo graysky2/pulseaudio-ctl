@@ -12,6 +12,7 @@ Q = @
 all:
 	$(Q)echo -e '\033[1;32mSetting version\033[0m'
 	$(Q)sed -e 's/@VERSION@/'$(VERSION)'/' common/$(PN).in >common/$(PN)
+	$(Q)sed -i common/$(PN) -e 's|@SKELDIR@|'$(SKELDIR)'|'
 
 clean:
 	$(RM) -f common/$(PN)
@@ -21,7 +22,7 @@ install-bin:
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
 	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
 	install -p -dm755 "$(DESTDIR)$(ZSHDIR)"
-	install -Dm644 common/zsh-completion "$(DESTDIR)/$(ZSHDIR)/_pulseaudio-ctl"
+	install -Dm644 common/zsh-completion "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
 
 install-man:
 	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'
@@ -32,7 +33,7 @@ uninstall:
 	$(RM) "$(DESTDIR)$(BINDIR)/$(PN)"
 	$(RM) "$(DESTDIR)$(MANDIR)/$(PN).1.gz"
 	$(RM) -rf "$(DESTDIR)$(SKELDIR)"
-	$(RM) "$(DESTDIR)/$(ZSHDIR)/_pulseaudio-ctl"
+	$(RM) "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
 
 install: install-bin install-man
 
