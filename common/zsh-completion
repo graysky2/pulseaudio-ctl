@@ -8,8 +8,9 @@ _pulseaudio-ctl() {
            'mute:toggle the mute status on/off'
            'mute-input:toggles the input status on/off'
            'set:set the volume to [n] %'
-           'atmost:only takes effect if current volume is higher than [n]')
-           
+           'atmost:only takes effect if current volume is higher than [n]'
+           'full-status:print current volume, sink mute state amd source mute state to stdout')
+
   _describe 'options' options
 }
 

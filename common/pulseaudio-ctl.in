@@ -240,7 +240,7 @@ case "$1" in
 
     echo -e "${BLD}pulseaudio-ctl v$VERS${NRM}"
     echo
-    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost}${NRM} [n]"
+    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost,full-status}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} [n] adjust volume in ±n % increments${NRM}"
@@ -248,6 +248,7 @@ case "$1" in
     echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} set the volume to [n] %${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect if current volume is higher than [n]${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}full-status${NRM}${BLD} prints volume level, sink and source mute state to stdout${NRM}"
     echo
     echo -e " ${BLD}Optionally, redefine an upper threshold in ${NRM}${BLU}$CONFIG${NRM}"
     echo
