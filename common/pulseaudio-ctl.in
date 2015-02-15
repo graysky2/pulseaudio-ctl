@@ -9,7 +9,7 @@
 # https://github.com/graysky2/pulseaudio-ctl
 
 VERS="@VERSION@"
-SKEL="/usr/share/pulseaudio-ctl/config.skel"
+SKEL="@SKELDIR@/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
 
 BLD="\e[01m"
@@ -222,6 +222,11 @@ case "$1" in
   C|c|[C,c]urrent)
     # useful only for scripting
     echo $CURVOL%
+    ;;
+  [F,f]s|[F,f]ull-[S,s]tatus)
+    # useful for scripting.
+    # returns current volume and sink and source mute state
+    echo $CURVOL $MUTED $SOURCE_MUTED
     ;;
   *)
     # send to notify-send if enabled
