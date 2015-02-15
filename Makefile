@@ -25,7 +25,7 @@ clean:
 	$(RM) -f doc/$(PN).1.gz
 
 install-bin:
-	$(Q)echo -e '\033[1;32mInstalling main script, initd and config...\033[0m'
+	$(Q)echo -e '\033[1;32mInstalling main script and config...\033[0m'
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
 	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
 	install -p -dm755 "$(DESTDIR)$(ZSHDIR)"
