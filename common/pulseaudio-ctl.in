@@ -22,6 +22,14 @@ command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
 
+command -v grep >/dev/null 2>&1 || {
+echo "I require sed but it's not installed. Aborting." >&2
+exit 1; }
+
+command -v cut >/dev/null 2>&1 || {
+echo "I require sed but it's not installed. Aborting." >&2
+exit 1; }
+
 command -v awk >/dev/null 2>&1 || {
 echo "I require awk but it's not installed. Aborting." >&2
 exit 1; }
@@ -115,14 +123,19 @@ checkconfig() {
 
 refreshcurvol() {
   # this worked some versions of PA 4 but is no longer valid with v5
-  # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] && 
-  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+  CURVOL=$(pacmd list-sinks|grep -A 15 'index: '$SINK| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
+    CURVOL=$(pacmd list-sinks|grep -A 15 'index: '$SINK| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 setup() {
-  SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+
+  if [[ $SINK_TYPE = 'default' ]]; then
+    SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+  elif [[ $SINK_TYPE == 'running' ]]; then
+    SINK=$(pactl list sinks | grep -B 1 State:\ RUNNING | grep Sink | cut -d\# -f2)
+  fi
+
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
@@ -140,6 +153,13 @@ setup() {
     fi
   done
 }
+
+# Which sink do we want to modify/report?
+SINK_TYPE='default'
+if [[ "$1" == '-r' ]]; then
+  SINK_TYPE='running'
+  shift
+fi
 
 checkconfig
 setup
