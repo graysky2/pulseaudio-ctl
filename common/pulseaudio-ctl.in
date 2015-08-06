@@ -130,10 +130,11 @@ refreshcurvol() {
 
 setup() {
 
-  if [[ $SINK_TYPE = 'default' ]]; then
-    SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
-  elif [[ $SINK_TYPE == 'running' ]]; then
+  if [[ $SINK_TYPE == 'running' ]]; then
     SINK=$(pactl list sinks | grep -B 1 State:\ RUNNING | grep Sink | cut -d\# -f2)
+  fi
+  if [[ -z "$SINK" ]] || [[ $SINK_TYPE == 'default' ]]; then
+    SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
   fi
 
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
