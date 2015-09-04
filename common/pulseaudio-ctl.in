@@ -196,7 +196,7 @@ case "$1" in
     ;;
   set)
     NEWVOL="${2%%%}"
-    [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
+    [[ "$NEWVOL" -gt $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       case "$PCV" in
         0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
