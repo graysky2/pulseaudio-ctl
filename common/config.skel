@@ -20,3 +20,6 @@
 # a setting will convert the percentage to a progress-bar in libnotify.
 #
 #BARCHART=yes
+
+# Use KDE OSD notification. Set to any value to enable this feature.
+#KDE_OSD=yes

@@ -111,6 +111,20 @@ checkconfig() {
       USEB=0
       ;;
   esac
+
+  case "${KDE_OSD,,}" in
+    y|yes|true|t|on|1|enabled|enable|use)
+      USEK=1
+      command -v dbus-send >/dev/null 2>&1 || {
+      echo "You wish to use KDE OSD notifications but I require dbus-send but it's not installed." >&2
+      echo "Modify $CONFIG or install the package that provides it. Aborting." >&2
+      exit 1; }
+      ;;
+    *)
+      USEK=0
+      ;;
+  esac
+
 }
 
 refreshcurvol() {
@@ -119,6 +133,14 @@ refreshcurvol() {
   [[ $PCV -eq 0 ]] && 
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+}
+
+refreshsrcvol() {
+  # this worked some versions of PA 4 but is no longer valid with v5
+  # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
+  [[ $PCV -eq 0 ]] &&
+  SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
+    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 setup() {
@@ -139,6 +161,14 @@ setup() {
       return 0
     fi
   done
+}
+
+kde_osd() {
+  dbus-send --session --dest="org.freedesktop.Notifications" --type="method_call" "/org/kde/osdService" "org.kde.osdService.volumeChanged" "int32:$1"
+}
+
+kde_osd_mic() {
+  dbus-send --session --dest="org.freedesktop.Notifications" --type="method_call" "/org/kde/osdService" "org.kde.osdService.mediaPlayerVolumeChanged" "int32:$1" "string:" "string:audio-input-microphone"
 }
 
 checkconfig
@@ -164,6 +194,8 @@ case "$1" in
         notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
         notify-send -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
+    [[ $USEK -eq 1 ]] &&
+      kde_osd $CURVOL
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by $PERC %
@@ -179,6 +211,8 @@ case "$1" in
         notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
         notify-send -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
+    [[ $USEK -eq 1 ]] &&
+      kde_osd $CURVOL
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes the volume entirely
@@ -186,6 +220,14 @@ case "$1" in
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
+    if [[ $USEK -eq 1 ]]; then
+      if [[ $MUTED == "yes" ]]; then
+        kde_osd 0
+      else
+        refreshcurvol
+        kde_osd $CURVOL
+      fi
+    fi
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes the microphone entirely
@@ -193,6 +235,14 @@ case "$1" in
     SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted
+    if [[ $USEK -eq 1 ]]; then
+      if [[ $SOURCE_MUTED == "yes" ]]; then
+        kde_osd_mic 0
+      else
+        refreshsrcvol
+        kde_osd_mic $SRCVOL
+      fi
+    fi
     ;;
   set)
     NEWVOL="${2%%%}"
@@ -205,6 +255,8 @@ case "$1" in
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
+    [[ $USEK -eq 1 ]] &&
+      kde_osd $CURVOL
     ;;
   atmost)
     NEWVOL="${2%%%}"
@@ -218,6 +270,8 @@ case "$1" in
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control
+    [[ $USEK -eq 1 ]] &&
+      kde_osd $CURVOL
     ;;
   C|c|[C,c]urrent)
     # useful only for scripting
