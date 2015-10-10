@@ -135,12 +135,19 @@ refreshcurvol() {
     CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
 
+<<<<<<< HEAD
 refreshsrcvol() {
   # this worked some versions of PA 4 but is no longer valid with v5
   # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
   SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
     SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+=======
+refreshbarvolperc() {
+  # calculates the volume percentage based on UPPER_THRESHOLD
+  # for proper display in the bar
+  UPPER_THRESHOLD_AWARE_VOL=$CURVOL*100/$UPPER_THRESHOLD
+>>>>>>> c7b092efc82f95cd132d9b6236be9c7f5d6a7800
 }
 
 setup() {
@@ -189,9 +196,10 @@ case "$1" in
       esac
 
     refreshcurvol
+    refreshbarvolperc
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
-        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
+        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
         notify-send -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
     [[ $USEK -eq 1 ]] &&
@@ -206,9 +214,10 @@ case "$1" in
         2) pactl set-sink-volume "$SINK" -$PERC% ;;
       esac
     refreshcurvol
+    refreshbarvolperc
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
-        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$CURVOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
+        notify-send -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
         notify-send -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
     fi
     [[ $USEK -eq 1 ]] &&
