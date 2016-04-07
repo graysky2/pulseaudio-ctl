@@ -320,8 +320,9 @@ case "$1" in
     echo -e " ${BLD}Detected sink    : ${NRM}${BLU}$SINK${NRM}"
     echo -e " ${BLD}Detected source  : ${NRM}${BLU}$SOURCE${NRM}"
     echo -e " ${BLD}Pulse version    : ${NRM}${BLU}$PAVERSION${NRM}"
-    exit 0
     ;;
 esac
+
+exit 0
 
 # vim:set ts=8 sts=2 sw=2 et:
