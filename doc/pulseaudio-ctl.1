@@ -31,11 +31,11 @@ Adjust master volume down by 5 % (default) or down by another value defined as t
 .TP
 .B
 mute
-Toggle the mute status of the master volume
+Set the mute status of the master volume to the value defined in the 2nd token. Toggle by default.
 .TP
 .B
 mute-input
-Toggle the mute status of the input device (microphone for example)
+Set the mute status of the input device (microphone for example) to the value defined in the 2nd token. Toggle by default.
 .TP
 .B
 set
@@ -69,11 +69,19 @@ Increase vol level by 25 %
 
 .fam T
 .fi
-Mute current output
+Toogle mute current output
 .PP
 .nf
 .fam C
         /usr/bin/pulseaudio-ctl mute
+
+.fam T
+.fi
+Unmute current output
+.PP
+.nf
+.fam C
+        /usr/bin/pulseaudio-ctl mute no
 
 .fam T
 .fi

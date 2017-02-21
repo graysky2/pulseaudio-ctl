@@ -223,8 +223,12 @@ case "$1" in
       kde_osd $CURVOL
     ;;
   M|m|[M,m]u|[M,m]ute)
-    # mutes the volume entirely
-    pactl set-sink-mute "$SINK" toggle
+    # mutes/unmutes the volume entirely
+    NEW_MUTE=toggle
+    if [[ $2 == 'no' || $2 == 'yes' || $2 == 'toggle' ]]; then
+      NEW_MUTE="$2"
+    fi
+    pactl set-sink-mute "$SINK" "$NEW_MUTE"
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
@@ -238,8 +242,12 @@ case "$1" in
     fi
     ;;
   [M,m]i|[M,m]ute-[I,i]nput)
-    # mutes the microphone entirely
-    pactl set-source-mute "$SOURCE" toggle
+    # mutes/umutes the microphone entirely
+    NEW_MUTE=toggle
+    if [[ $2 == 'no' || $2 == 'yes' || $2 == 'toggle' ]]; then
+      NEW_MUTE="$2"
+    fi
+    pactl set-source-mute "$SOURCE" "$NEW_MUTE"
     SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted
