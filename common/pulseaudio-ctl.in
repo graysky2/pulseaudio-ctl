@@ -241,6 +241,21 @@ case "$1" in
       fi
     fi
     ;;
+  [U,u]nmute)
+    # unmutes the volume
+    pactl set-sink-mute "$SINK" 0
+    MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+    [[ $USEN -eq 1 ]] &&
+      notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
+    if [[ $USEK -eq 1 ]]; then
+      if [[ $MUTED == "yes" ]]; then
+        kde_osd 0
+      else
+        refreshcurvol
+        kde_osd $CURVOL
+      fi
+    fi
+    ;;
   [M,m]i|[M,m]ute-[I,i]nput)
     # mutes/umutes the microphone entirely
     NEW_MUTE=toggle
@@ -310,11 +325,12 @@ case "$1" in
 
     echo -e "${BLD}pulseaudio-ctl v$VERS${NRM}"
     echo
-    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,mute-input,set,atmost,full-status}${NRM} [n]"
+    echo -e " ${BLD}$0 ${NRM}${BLU}{up,down,mute,unmute,mute-input,set,atmost,full-status}${NRM} [n]"
     echo
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} adjust volume in ±5 % increments${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}up${NRM}${BLD} and ${NRM}${BLU}down${NRM}${BLD} [n] adjust volume in ±n % increments${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute${NRM}${BLD} toggles the mute status on/off${NRM}"
+    echo -e " ${BLD}Where ${NRM}${BLU}unmute${NRM}${BLD} unmutes the sink${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}mute-input${NRM}${BLD} toggles the input status on/off${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}set${NRM}${BLD} set the volume to [n] %${NRM}"
     echo -e " ${BLD}Where ${NRM}${BLU}atmost${NRM}${BLD} only takes effect if current volume is higher than [n]${NRM}"
