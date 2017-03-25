@@ -36,7 +36,7 @@ exit 1; }
 
 # really crude pactl version check since commands are different for different
 # versions of pactl. sorry users of PA <5
-PAVERSION=$(pactl --version | grep pactl | sed 's/^pactl //' | cut -c1-3)
+PAVERSION=$(pactl --version | grep pactl | sed 's/^pactl //')
 if [[ ${PAVERSION%%.*} -lt 5 ]]; then
   PCV=0
 elif [[ 1 -eq "$(echo "${PAVERSION} > 5.1" | bc)" ]]; then
