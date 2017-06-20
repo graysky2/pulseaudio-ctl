@@ -35,6 +35,13 @@ BARCHART=yes
 
 # Use KDE OSD notification. Set to any value to enable this feature.
 KDE_OSD=yes
+
+# Allows you to choose the default sink based on a word or phrase that is unique
+# to the hardware device that you're trying to target. Use this if you have
+# multiple devices but only want to use pulseaudio-ctl to manage one of them
+# specifically. Use the command "pacmd list-sinks" to find a list of available
+# output devices/sinks.
+#OVERRIDE_SINK=wireless
 ```
 
 If config file isn't present script uses default value 100 for the UPPER_THRESHOLD and notifications are disabled by default.
