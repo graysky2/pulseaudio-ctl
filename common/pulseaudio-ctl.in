@@ -150,7 +150,11 @@ refreshbarvolperc() {
 }
 
 setup() {
-  SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+  if [[ -n "${OVERRIDE_SINK}" ]]; then
+    SINK=$(pacmd list-sinks|grep -iB 1 "${OVERRIDE_SINK}"|grep "index:"|sed -r 's/.*index: *([0-9]+)/\1/g')
+  else
+    SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
+  fi
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
   MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
   SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
