@@ -130,17 +130,17 @@ checkconfig() {
 refreshcurvol() {
   # this worked some versions of PA 4 but is no longer valid with v5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
-  [[ $PCV -eq 0 ]] && 
-  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+  [[ $PCV -eq 0 ]] &&
+  CURVOL=$(pacmd list-sinks|grep -A 15 "index: ${SINK}"| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
+    CURVOL=$(pacmd list-sinks|grep -A 15 "index: ${SINK}"| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 refreshsrcvol() {
   # this worked some versions of PA 4 but is no longer valid with v5
   # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
-  SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+  SRCVOL=$(pacmd list-sources|grep -A 15 "index: ${SOURCE}"| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
+    SRCVOL=$(pacmd list-sources|grep -A 15 "index: ${SOURCE}"| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 refreshbarvolperc() {
@@ -150,14 +150,14 @@ refreshbarvolperc() {
 }
 
 setup() {
-  if [[ -n "${OVERRIDE_SINK}" ]]; then
-    SINK=$(pacmd list-sinks|grep -iB 1 "${OVERRIDE_SINK}"|grep "index:"|sed -r 's/.*index: *([0-9]+)/\1/g')
+  if [[ -n "${DEFAULT_SINK}" ]]; then
+    SINK=$(pacmd list-sinks|grep -iB 1 "${DEFAULT_SINK}"|grep "index:"|sed -r 's/.*index: *([0-9]+)/\1/g')
   else
     SINK=$(pacmd list-sinks|awk '/\* index:/{ print $3 }')
   fi
   SOURCE=$(pacmd list-sources|awk '/\* index:/{ print $3 }')
-  MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
-  SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+  MUTED=$(pacmd list-sinks|grep -A 15 "index: ${SINK}"|awk '/muted:/{ print $2 }')
+  SOURCE_MUTED=$(pacmd list-sources|grep -A 15 "index: ${SOURCE}"|awk '/muted:/{ print $2 }')
   
   refreshcurvol # sets CURVOL ahead of integer check
 
@@ -233,7 +233,7 @@ case "$1" in
       NEW_MUTE="$2"
     fi
     pactl set-sink-mute "$SINK" "$NEW_MUTE"
-    MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+    MUTED=$(pacmd list-sinks|grep -A 15 "index: ${SINK}"|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
     if [[ $USEK -eq 1 ]]; then
@@ -252,7 +252,7 @@ case "$1" in
       NEW_MUTE="$2"
     fi
     pactl set-source-mute "$SOURCE" "$NEW_MUTE"
-    SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
+    SOURCE_MUTED=$(pacmd list-sources|grep -A 15 "index: ${SOURCE}"|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
       notify-send -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted
     if [[ $USEK -eq 1 ]]; then
