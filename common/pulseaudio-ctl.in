@@ -38,7 +38,11 @@ exit 1; }
 # versions of pactl. sorry users of PA <5
 PAVERSION=$(pactl --version | grep pactl | sed 's/^pactl //')
 if [[ ${PAVERSION%%.*} -lt 5 ]]; then
+  # really old versions
   PCV=0
+elif [[ 1 -eq "$(echo "${PAVERSION} > 10.9" | bc)" ]]; then
+  # since v11, they reverted the -- requirement
+  PCV=2
 elif [[ 1 -eq "$(echo "${PAVERSION} > 5.1" | bc)" ]]; then
   # version is upstream 5.99.2 or higher
   PCV=2
