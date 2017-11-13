@@ -53,7 +53,7 @@ fi
 
 # stop if the above failed to set a value for PCV
 if [[ -z $PCV ]]; then
-  echo -e ${BLD}"Cannot determine which version of pactl is installed. ${RED}Aborting."${NRM}
+  echo -e "${BLD}Cannot determine which version of pactl is installed. ${RED}Aborting.${NRM}"
   exit 1
 fi
 
@@ -67,17 +67,17 @@ is_integer() {
 
 makeconfig() {
   if [[ ! -f "$SKEL" ]]; then
-    echo -e "${RED}$SKEL is missing. Reinstall this package to continue."${NRM}
+    echo -e "${RED}$SKEL is missing. Reinstall this package to continue.${NRM}"
     exit 1
   fi
 
   if [[ ! -f "$CONFIG" ]]; then
-    echo -e ${BLD}'------------------------------------------------------------'${NRM}
-    echo -e ${BLD}' No config file found so creating a fresh one in:'${NRM}
-    echo -e ${BLD}${BLU}" $CONFIG"${NRM}
+    echo -e "${BLD}------------------------------------------------------------${NRM}"
+    echo -e "${BLD} No config file found so creating a fresh one in:${NRM}"
+    echo -e "${BLD}${BLU} $CONFIG${NRM}"
     echo
-    echo -e ${BLD}" Edit this file if desired."${NRM}
-    echo -e ${BLD}'------------------------------------------------------------'${NRM}
+    echo -e "${BLD} Edit this file if desired.${NRM}"
+    echo -e "${BLD}------------------------------------------------------------${NRM}"
     install -Dm644 "$SKEL" "$CONFIG"
   fi
 }
@@ -166,7 +166,7 @@ setup() {
   VARS_TO_CHECK=([SINK]="default sink" [SOURCE]="default source" [CURVOL]="current volume")
   for v in "${!VARS_TO_CHECK[@]}"; do
     if [[ -n "${!v}" ]]; then
-      [[ $(is_integer "${!v}") == '1' ]] || echo -e "${RED}Cannot determine ${VARS_TO_CHECK[$v]}."${NRM}
+      [[ $(is_integer "${!v}") == '1' ]] || echo -e "${RED}Cannot determine ${VARS_TO_CHECK[$v]}.${NRM}"
     else
       return 0
     fi
@@ -231,15 +231,15 @@ case "$1" in
         ${USEB+"--hint=string:synchronous:volume"}
     fi
     [[ $USEK -eq 1 ]] &&
-      kde_osd $CURVOL
+      kde_osd "$CURVOL"
     ;;
   D|d|[D,d]own|[D,d]o)
     # lowers volume by $PERC %
     [[ "$PERC" -gt "$CURVOL" ]] && PERC="$CURVOL"
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
       case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- -$PERC% ;;
-        2) pactl set-sink-volume "$SINK" -$PERC% ;;
+        0|1) pactl set-sink-volume "$SINK" -- "-$PERC%" ;;
+        2) pactl set-sink-volume "$SINK" "-$PERC%" ;;
       esac
     refreshcurvol
     refreshbarvolperc
@@ -251,7 +251,7 @@ case "$1" in
         ${USEB+"--hint=string:synchronous:volume"}
     fi
     [[ $USEK -eq 1 ]] &&
-      kde_osd $CURVOL
+      kde_osd "$CURVOL"
     ;;
   M|m|[M,m]u|[M,m]ute)
     # mutes/unmutes the volume entirely
@@ -268,7 +268,7 @@ case "$1" in
         kde_osd 0
       else
         refreshcurvol
-        kde_osd $CURVOL
+        kde_osd "$CURVOL"
       fi
     fi
     ;;
@@ -287,7 +287,7 @@ case "$1" in
         kde_osd_mic 0
       else
         refreshsrcvol
-        kde_osd_mic $SRCVOL
+        kde_osd_mic "$SRCVOL"
       fi
     fi
     ;;
@@ -296,14 +296,14 @@ case "$1" in
     [[ "$NEWVOL" -gt $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
-        2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
+        0|1) pactl set-sink-volume "$SINK" -- "$NEWVOL%" ;;
+        2) pactl set-sink-volume "$SINK" "$NEWVOL%" ;;
       esac
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify "Volume set" "Level: $CURVOL"
     [[ $USEK -eq 1 ]] &&
-      kde_osd $CURVOL
+      kde_osd "$CURVOL"
     ;;
   atmost)
     NEWVOL="${2%%%}"
@@ -311,23 +311,23 @@ case "$1" in
       [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
       case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
-        2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
+        0|1) pactl set-sink-volume "$SINK" -- "$NEWVOL%" ;;
+        2) pactl set-sink-volume "$SINK" "$NEWVOL%" ;;
       esac
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify "Atmost set" "Level: $CURVOL"
     [[ $USEK -eq 1 ]] &&
-      kde_osd $CURVOL
+      kde_osd "$CURVOL"
     ;;
   C|c|[C,c]urrent)
     # useful only for scripting
-    echo $CURVOL%
+    echo "$CURVOL%"
     ;;
   [F,f]s|[F,f]ull-[S,s]tatus)
     # useful for scripting.
     # returns current volume and sink and source mute state
-    echo $CURVOL $MUTED $SOURCE_MUTED
+    echo "$CURVOL" "$MUTED" "$SOURCE_MUTED"
     ;;
   *)
     # send to notify-send if enabled
