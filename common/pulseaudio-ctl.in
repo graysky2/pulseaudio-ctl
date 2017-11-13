@@ -150,7 +150,7 @@ refreshsrcvol() {
 refreshbarvolperc() {
   # calculates the volume percentage based on UPPER_THRESHOLD
   # for proper display in the bar
-  UPPER_THRESHOLD_AWARE_VOL=$CURVOL*100/$UPPER_THRESHOLD
+  UPPER_THRESHOLD_AWARE_VOL=$(($CURVOL*100/$UPPER_THRESHOLD))
 }
 
 setup() {
