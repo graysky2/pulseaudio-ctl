@@ -204,6 +204,15 @@ notify(){
     "$@"
 }
 
+pactl_volume() {
+  local sink=${1?No sink given} vol=${2?No volume given}
+
+  case "$PCV" in
+    0|1) pactl set-sink-volume "$sink" -- "$vol%" ;;
+    2) pactl set-sink-volume "$sink" "$vol%" ;;
+  esac
+}
+
 checkconfig
 setup
 # checks if exist a valid $2 
@@ -216,10 +225,7 @@ case "$1" in
     # in cases where external apps have pushed it above
     [[ "$(( $PERC + $CURVOL ))" -gt "$UPPER_THRESHOLD" ]] && PERC="$(( $UPPER_THRESHOLD - $CURVOL ))"
     [[ "$CURVOL" -ge $UPPER_THRESHOLD ]] && pactl set-sink-volume "$SINK" $UPPER_THRESHOLD% ||
-      case "$PCV" in
-          0|1) pactl set-sink-volume "$SINK" -- +$PERC% ;;
-          2) pactl set-sink-volume "$SINK" +$PERC% ;;
-      esac
+      pactl_volume "$SINK" "+${PERC}"
 
     refreshcurvol
     refreshbarvolperc
@@ -237,10 +243,7 @@ case "$1" in
     # lowers volume by $PERC %
     [[ "$PERC" -gt "$CURVOL" ]] && PERC="$CURVOL"
     [[ "$CURVOL" -le 0 ]] && exit 0 ||
-      case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- "-$PERC%" ;;
-        2) pactl set-sink-volume "$SINK" "-$PERC%" ;;
-      esac
+      pactl_volume "$SINK" "-${PERC}"
     refreshcurvol
     refreshbarvolperc
     if [[ $USEN -eq 1 ]]; then
@@ -295,10 +298,7 @@ case "$1" in
     NEWVOL="${2%%%}"
     [[ "$NEWVOL" -gt $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- "$NEWVOL%" ;;
-        2) pactl set-sink-volume "$SINK" "$NEWVOL%" ;;
-      esac
+      pactl_volume "$SINK" "$NEWVOL"
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify "Volume set" "Level: $CURVOL"
@@ -310,10 +310,7 @@ case "$1" in
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
       [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
       [[ "$NEWVOL" -le 0 ]] && exit 0 ||
-      case "$PCV" in
-        0|1) pactl set-sink-volume "$SINK" -- "$NEWVOL%" ;;
-        2) pactl set-sink-volume "$SINK" "$NEWVOL%" ;;
-      esac
+      pactl_volume "$SINK" "$NEWVOL"
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
       notify "Atmost set" "Level: $CURVOL"
