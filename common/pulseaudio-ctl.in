@@ -22,6 +22,10 @@ command -v sed >/dev/null 2>&1 || {
 echo "I require sed but it's not installed. Aborting." >&2
 exit 1; }
 
+command -v grep >/dev/null 2>&1 || {
+echo "I require grep but it's not installed. Aborting." >&2
+exit 1; }
+
 command -v awk >/dev/null 2>&1 || {
 echo "I require awk but it's not installed. Aborting." >&2
 exit 1; }
