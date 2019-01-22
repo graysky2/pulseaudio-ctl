@@ -34,6 +34,10 @@ command -v pacmd >/dev/null 2>&1 || {
 echo "I require pacmd but it's not installed. Aborting." >&2
 exit 1; }
 
+command -v bc >/dev/null @>&1 || {
+echo "I require bc but it's not installed. Aborting." >&2
+exit 1; }
+
 # really crude pactl version check since commands are different for different
 # versions of pactl. sorry users of PA <5
 PAVERSION=$(pactl --version | grep pactl | pactl --version | grep pactl | sed -e 's/^pactl //' -e 's/\([0-9.]\+\).*/\1/')
