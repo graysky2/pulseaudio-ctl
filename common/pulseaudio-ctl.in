@@ -36,7 +36,7 @@ exit 1; }
 
 # really crude pactl version check since commands are different for different
 # versions of pactl. sorry users of PA <5
-PAVERSION=$(pactl --version | sed -ne 's/pactl \([0-9]\+.[0-9]\+\).\+/\1/p')
+PAVERSION=$(pactl --version | sed -ne 's/pactl \([0-9]\+.[0-9]\+\).*/\1/p')
 if [[ ${PAVERSION%%.*} -lt 5 ]]; then
   # really old versions
   PCV=0
