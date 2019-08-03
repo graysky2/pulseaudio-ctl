@@ -21,14 +21,15 @@ clean:
 
 install-bin: common/$(PN)
 	$(Q)echo -e '\033[1;32mInstalling main script and config...\033[0m'
-	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
-	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
-	install -p -dm755 "$(DESTDIR)$(ZSHDIR)"
-	install -Dm644 common/zsh-completion "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
+	install -d -m755 "$(DESTDIR)$(BINDIR)" "$(DESTDIR)$(SKELDIR)" "$(DESTDIR)$(ZSHDIR)"
+	install -m755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
+	install -m644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
+	install -m644 common/zsh-completion "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
 
 install-man:
 	$(Q)echo -e '\033[1;32mInstalling manpage...\033[0m'
-	install -Dm644 doc/$(PN).1 "$(DESTDIR)$(MANDIR)/$(PN).1"
+	install -d -m755 "$(DESTDIR)$(MANDIR)"
+	install -m644 doc/$(PN).1 "$(DESTDIR)$(MANDIR)/$(PN).1"
 
 uninstall:
 	$(RM) "$(DESTDIR)$(BINDIR)/$(PN)"
