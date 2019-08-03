@@ -19,7 +19,7 @@ common/$(PN): common/$(PN).in
 clean:
 	$(RM) -f common/$(PN)
 
-install-bin:
+install-bin: common/$(PN)
 	$(Q)echo -e '\033[1;32mInstalling main script and config...\033[0m'
 	install -Dm755 common/$(PN) "$(DESTDIR)$(BINDIR)/$(PN)"
 	install -Dm644 common/config.skel "$(DESTDIR)$(SKELDIR)/config.skel"
@@ -36,6 +36,6 @@ uninstall:
 	$(RM) -rf "$(DESTDIR)$(SKELDIR)"
 	$(RM) "$(DESTDIR)$(ZSHDIR)/_pulseaudio-ctl"
 
-install: all install-bin install-man
+install: install-bin install-man
 
 .PHONY: all clean install-bin install-man uninstall
