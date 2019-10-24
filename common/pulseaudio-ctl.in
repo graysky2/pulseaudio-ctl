@@ -44,7 +44,7 @@ exit 1; }
 
 # really crude pactl version check since commands are different for different
 # versions of pactl. sorry users of PA <5
-PAVERSION=$(pactl --version | grep pactl | pactl --version | grep pactl | sed -e 's/^pactl //' -e 's/\([0-9.]\+\).*/\1/')
+PAVERSION=$(pactl --version | grep pactl | sed -e 's/^pactl //' -e 's/\([0-9.]\+\).\([0-9.]\+\)$/\1/')
 if [[ ${PAVERSION%%.*} -lt 5 ]]; then
   # really old versions
   PCV=0
@@ -313,7 +313,7 @@ case "$1" in
   *)
     # send to notify-send if enabled
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE\nPulse version    : $PAVERSION" --icon=multimedia-volume-control
+      notify-send -a pulseaudio-ctl -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE" --icon=multimedia-volume-control
     # add pretty colors for mute status for CLI only
     [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||
       MUTED="${NRM}${GRN}$MUTED${NRM}"
@@ -339,7 +339,6 @@ case "$1" in
     echo -e " ${BLD}Is source muted  : $SOURCE_MUTED"
     echo -e " ${BLD}Detected sink    : ${NRM}${BLU}$SINK${NRM}"
     echo -e " ${BLD}Detected source  : ${NRM}${BLU}$SOURCE${NRM}"
-    echo -e " ${BLD}Pulse version    : ${NRM}${BLU}$PAVERSION${NRM}"
     ;;
 esac
 
