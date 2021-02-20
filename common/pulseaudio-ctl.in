@@ -174,11 +174,11 @@ setup() {
 }
 
 kde_osd() {
-  dbus-send --session --dest="org.freedesktop.Notifications" --type="method_call" "/org/kde/osdService" "org.kde.osdService.volumeChanged" "int32:$1"
+  dbus-send --session --dest="org.kde.plasmashell" --type="method_call" "/org/kde/osdService" "org.kde.osdService.volumeChanged" "int32:$1" "int32:$UPPER_THRESHOLD"
 }
 
 kde_osd_mic() {
-  dbus-send --session --dest="org.freedesktop.Notifications" --type="method_call" "/org/kde/osdService" "org.kde.osdService.mediaPlayerVolumeChanged" "int32:$1" "string:" "string:audio-input-microphone"
+  dbus-send --session --dest="org.kde.plasmashell" --type="method_call" "/org/kde/osdService" "org.kde.osdService.mediaPlayerVolumeChanged" "int32:$1" "string:" "string:audio-input-microphone"
 }
 
 checkconfig
