@@ -136,7 +136,7 @@ refreshcurvol() {
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] && 
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: [front/mono]/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 refreshsrcvol() {
@@ -144,7 +144,7 @@ refreshsrcvol() {
   # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
   SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: [front/mono]/{ print $5 }' | sed 's/[%|,]//g')
 }
 
 refreshbarvolperc() {
