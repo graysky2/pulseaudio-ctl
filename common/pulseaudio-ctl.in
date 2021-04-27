@@ -131,21 +131,27 @@ checkconfig() {
 
 }
 
+getdefaultsinkname() {
+    pacmd stat | awk -F": " '/^Default sink name: /{print $2}'
+}
+
 refreshcurvol() {
-  # this worked some versions of PA 4 but is no longer valid with v5
+  # Updated to work with PulseAudio 5
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
-  [[ $PCV -eq 0 ]] && 
-  CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+    CURVOL=$(pacmd list-sinks |
+        awk '/^\s+name: /{indefault = $2 == "<'$(getdefaultsinkname)'>"}
+            /^\s+volume: / && indefault {print $5; exit}' |
+        awk -F"%" '{print $1}')
 }
 
 refreshsrcvol() {
-  # this worked some versions of PA 4 but is no longer valid with v5
+  # Updated to work with PulseAudio 5
   # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
   SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
     SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
 }
+
 
 refreshbarvolperc() {
   # calculates the volume percentage based on UPPER_THRESHOLD
