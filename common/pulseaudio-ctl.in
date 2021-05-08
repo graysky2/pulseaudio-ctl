@@ -136,7 +136,7 @@ getdefaultsinkname() {
 }
 
 refreshcurvol() {
-  # Updated to work with PulseAudio 5
+  # Updated to work with PulseAudio 14
   # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
     CURVOL=$(pacmd list-sinks |
         awk '/^\s+name: /{indefault = $2 == "<'$(getdefaultsinkname)'>"}
@@ -145,7 +145,7 @@ refreshcurvol() {
 }
 
 refreshsrcvol() {
-  # Updated to work with PulseAudio 5
+  # Updated to work with PulseAudio 14
   # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
   SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
