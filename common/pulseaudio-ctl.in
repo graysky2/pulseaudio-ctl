@@ -11,6 +11,7 @@
 VERS="@VERSION@"
 SKEL="@SKELDIR@/config.skel"
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/pulseaudio-ctl/config"
+LANG=C
 
 BLD="\e[01m"
 BLU="\e[01;34m"
@@ -132,19 +133,15 @@ checkconfig() {
 }
 
 refreshcurvol() {
-  # this worked some versions of PA 4 but is no longer valid with v5
-  # CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] && 
   CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+    CURVOL=$(pacmd list-sinks|grep -A 15 '* index'| awk '/volume: /{ print $5 }' | grep -m 1 % |sed 's/[%|,]//g')
 }
 
 refreshsrcvol() {
-  # this worked some versions of PA 4 but is no longer valid with v5
-  # SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/base volume: /{ print $5 }'|sed 's/%//')
   [[ $PCV -eq 0 ]] &&
   SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $3 }' | grep -m 1 % |sed 's/[%|,]//g') ||
-    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: front/{ print $5 }' | sed 's/[%|,]//g')
+    SRCVOL=$(pacmd list-sources|grep -A 15 '* index'| awk '/volume: /{ print $5 }' | grep -m 1 % |sed 's/[%|,]//g')
 }
 
 refreshbarvolperc() {
