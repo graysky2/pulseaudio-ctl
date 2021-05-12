@@ -184,6 +184,8 @@ setup
 PERC=5
 [[ -n "$2" ]] && [[ $(is_integer "${2%%%}") == '1' ]] && PERC=${2%%%} 
 
+NOTIF_FILE=/tmp/pulseaudio-ctl-notification
+
 case "$1" in
   U|u|[U,u]p)
     # raise volume by $PERC % or set it to the upper threshold
@@ -199,8 +201,8 @@ case "$1" in
     refreshbarvolperc
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
-        notify-send -a pulseaudio-ctl -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume up $PERC %" "" ||
-        notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+        notify-send.sh -a pulseaudio-ctl -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume up $PERC %" "" -R $NOTIF_FILE ||
+        notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume up $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control -R $NOTIF_FILE
     fi
     [[ $USEK -eq 1 ]] &&
       kde_osd $CURVOL
@@ -217,8 +219,8 @@ case "$1" in
     refreshbarvolperc
     if [[ $USEN -eq 1 ]]; then
       [[ $USEB -eq 1 ]] &&
-        notify-send -a pulseaudio-ctl -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume down $PERC %" "" ||
-        notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control
+        notify-send.sh -a pulseaudio-ctl -t 1000 -i multimedia-volume-control --hint=int:transient:1 --hint=int:value:$UPPER_THRESHOLD_AWARE_VOL --hint=string:synchronous:volume "Volume down $PERC %" "" -R $NOTIF_FILE ||
+        notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume down $PERC%" "Current is $CURVOL %" --icon=multimedia-volume-control -R $NOTIF_FILE
     fi
     [[ $USEK -eq 1 ]] &&
       kde_osd $CURVOL
@@ -232,7 +234,7 @@ case "$1" in
     pactl set-sink-mute "$SINK" "$NEW_MUTE"
     MUTED=$(pacmd list-sinks|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted
+      notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $MUTED" --icon=audio-volume-muted -R $NOTIF_FILE
     if [[ $USEK -eq 1 ]]; then
       if [[ $MUTED == "yes" ]]; then
         kde_osd 0
@@ -251,7 +253,7 @@ case "$1" in
     pactl set-source-mute "$SOURCE" "$NEW_MUTE"
     SOURCE_MUTED=$(pacmd list-sources|grep -A 15 '* index'|awk '/muted:/{ print $2 }')
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted
+      notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Mute toggle" "Muted: $SOURCE_MUTED" --icon=audio-volume-muted -R $NOTIF_FILE
     if [[ $USEK -eq 1 ]]; then
       if [[ $SOURCE_MUTED == "yes" ]]; then
         kde_osd_mic 0
@@ -271,7 +273,7 @@ case "$1" in
       esac
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control
+      notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Volume set" "Level: $CURVOL" --icon=multimedia-volume-control -R $NOTIF_FILE
     [[ $USEK -eq 1 ]] &&
       kde_osd $CURVOL
     ;;
@@ -286,7 +288,7 @@ case "$1" in
       esac
     refreshcurvol
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control
+      notify-send.sh -a pulseaudio-ctl -t 1000 --hint=int:transient:1 "Atmost set" "Level: $CURVOL" --icon=multimedia-volume-control -R $NOTIF_FILE
     [[ $USEK -eq 1 ]] &&
       kde_osd $CURVOL
     ;;
@@ -302,7 +304,7 @@ case "$1" in
   *)
     # send to notify-send if enabled
     [[ $USEN -eq 1 ]] &&
-      notify-send -a pulseaudio-ctl -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE" --icon=multimedia-volume-control
+      notify-send.sh -a pulseaudio-ctl -t 8000 --hint=int:transient:1 "Pulseaudio Settings" "Volume level     : $CURVOL %\nIs sink muted    : $MUTED\nIs source muted  : $SOURCE_MUTED\nDetected sink    : $SINK\nDetected source  : $SOURCE" --icon=multimedia-volume-control -R $NOTIF_FILE
     # add pretty colors for mute status for CLI only
     [[ "$MUTED" = "yes" ]] && MUTED="${NRM}${RED}$MUTED${NRM}" ||
       MUTED="${NRM}${GRN}$MUTED${NRM}"
