@@ -264,7 +264,7 @@ case "$1" in
   set)
     NEWVOL="${2%%%}"
     [[ "$NEWVOL" -gt $UPPER_THRESHOLD ]] && exit 0 ||
-      [[ "$NEWVOL" -le 0 ]] && exit 0 ||
+      [[ "$NEWVOL" -lt 0 ]] && exit 0 ||
       case "$PCV" in
         0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
         2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
@@ -278,8 +278,8 @@ case "$1" in
   atmost)
     NEWVOL="${2%%%}"
     [[ "$CURVOL" -le "$NEWVOL" ]] && exit 0 ||
-      [[ "$NEWVOL" -ge $UPPER_THRESHOLD ]] && exit 0 ||
-      [[ "$NEWVOL" -le 0 ]] && exit 0 ||
+      [[ "$NEWVOL" -gt $UPPER_THRESHOLD ]] && exit 0 ||
+      [[ "$NEWVOL" -lt 0 ]] && exit 0 ||
       case "$PCV" in
         0|1) pactl set-sink-volume "$SINK" -- $NEWVOL% ;;
         2) pactl set-sink-volume "$SINK" $NEWVOL% ;;
